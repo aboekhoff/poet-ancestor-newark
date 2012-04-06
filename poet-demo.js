@@ -2048,7 +2048,7 @@ if (typeof require != 'undefined') {
   return x_0_0;
 })();
 
-// poet-page.newark
+// poet-demo.newark
 
 (function () {
   var x_0_0, x_0_1, x_0_2, x_0_3, x_0_4, x_0_5, x_0_6, x_0_7, x_0_8, x_0_9, x_0_10, x_0_11, x_0_12;
@@ -2063,54 +2063,54 @@ if (typeof require != 'undefined') {
   x_0_3 = newark["prelude::make-keyword"]("mass");
   x_0_1 = newark["prelude::make-keyword"]("ball");
   x_0_6 = newark["prelude::make-keyword"]("x-pos");
-  newark["poet-page::num-balls"] = 200;
-  newark["poet-page::max-radius"] = 30;
-  newark["poet-page::min-radius"] = 10;
-  newark["poet-page::max-mass"] = 10;
-  newark["poet-page::min-mass"] = 1;
-  newark["poet-page::max-speed"] = 8;
-  newark["poet-page::min-speed"] = -8;
-  newark["poet-page::canvas"] = null;
-  newark["poet-page::-width"] = null;
-  newark["poet-page::-height"] = null;
-  newark["poet-page::-step"] = 0.2;
-  newark["poet-page::resize!"] = (function () {
+  newark["poet-demo::num-balls"] = 200;
+  newark["poet-demo::max-radius"] = 30;
+  newark["poet-demo::min-radius"] = 10;
+  newark["poet-demo::max-mass"] = 10;
+  newark["poet-demo::min-mass"] = 1;
+  newark["poet-demo::max-speed"] = 8;
+  newark["poet-demo::min-speed"] = -8;
+  newark["poet-demo::canvas"] = null;
+  newark["poet-demo::-width"] = null;
+  newark["poet-demo::-height"] = null;
+  newark["poet-demo::-step"] = 0.2;
+  newark["poet-demo::resize!"] = (function () {
     var x_1_0, x_1_1, x_1_2;
     label_1_0:{
-      x_1_2 = (newark["poet-page::-width"] === newark["core::js"]["innerWidth"]);
+      x_1_2 = (newark["poet-demo::-width"] === newark["core::js"]["innerWidth"]);
       if (!(x_1_2 == null || x_1_2 === false)) {
-        x_1_1 = (newark["poet-page::-height"] === newark["core::js"]["innerHeight"]);
+        x_1_1 = (newark["poet-demo::-height"] === newark["core::js"]["innerHeight"]);
       } else {
         x_1_1 = x_1_2;
       };
       if (!(x_1_1 == null || x_1_1 === false)) {
         x_1_0 = null;
       } else {
-        newark["poet-page::-width"] = newark["core::js"]["innerWidth"];
-        newark["poet-page::-height"] = newark["core::js"]["innerHeight"];
-        newark["poet-page::canvas"]["width"] = newark["poet-page::-width"];
-        newark["poet-page::canvas"]["height"] = newark["poet-page::-height"];
+        newark["poet-demo::-width"] = newark["core::js"]["innerWidth"];
+        newark["poet-demo::-height"] = newark["core::js"]["innerHeight"];
+        newark["poet-demo::canvas"]["width"] = newark["poet-demo::-width"];
+        newark["poet-demo::canvas"]["height"] = newark["poet-demo::-height"];
       };
     };
     return x_1_0;
   });
-  newark["poet-page::resize!"][":name"] = "resize!";
-  newark["poet-page::get-context"] = (function () {
+  newark["poet-demo::resize!"][":name"] = "resize!";
+  newark["poet-demo::get-context"] = (function () {
     var x_1_0;
     label_1_0:{
-      x_1_0 = newark["poet-page::canvas"]["getContext"]("2d");
+      x_1_0 = newark["poet-demo::canvas"]["getContext"]("2d");
     };
     return x_1_0;
   });
-  newark["poet-page::get-context"][":name"] = "get-context";
-  newark["poet-page::rotate-about"] = (function (a_1_0, a_1_1, a_1_2) {
+  newark["poet-demo::get-context"][":name"] = "get-context";
+  newark["poet-demo::rotate-about"] = (function (a_1_0, a_1_1, a_1_2) {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5;
     label_1_0:{
       x_1_2 = a_1_2;
       if (!(x_1_2 == null || x_1_2 === false)) {
         x_1_1 = x_1_2;
       } else {
-        x_1_1 = newark["poet-page::get-context"]();
+        x_1_1 = newark["poet-demo::get-context"]();
       };
       x_1_3 = x_1_1;
       x_1_3["translate"](a_1_0["0"], a_1_0["1"]);
@@ -2122,8 +2122,8 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::rotate-about"][":name"] = "rotate-about";
-  newark["poet-page::random"] = (function (a_1_0, a_1_1) {
+  newark["poet-demo::rotate-about"][":name"] = "rotate-about";
+  newark["poet-demo::random"] = (function (a_1_0, a_1_1) {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5;
     label_1_0:{
       if (!(a_1_1 == null || a_1_1 === false)) {
@@ -2143,29 +2143,29 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::random"][":name"] = "random";
-  newark["poet-page::random-int"] = (function (a_1_0, a_1_1) {
+  newark["poet-demo::random"][":name"] = "random";
+  newark["poet-demo::random-int"] = (function (a_1_0, a_1_1) {
     var x_1_0, x_1_1;
     label_1_0:{
-      x_1_1 = newark["poet-page::random"](a_1_0, a_1_1);
+      x_1_1 = newark["poet-demo::random"](a_1_0, a_1_1);
       x_1_0 = newark["core::js"]["Math"]["floor"](x_1_1);
     };
     return x_1_0;
   });
-  newark["poet-page::random-int"][":name"] = "random-int";
-  newark["poet-page::random-color"] = (function () {
+  newark["poet-demo::random-int"][":name"] = "random-int";
+  newark["poet-demo::random-color"] = (function () {
     var x_1_0, x_1_1, x_1_2, x_1_3;
     label_1_0:{
-      x_1_1 = newark["poet-page::random-int"](255);
-      x_1_2 = newark["poet-page::random-int"](255);
-      x_1_3 = newark["poet-page::random-int"](255);
+      x_1_1 = newark["poet-demo::random-int"](255);
+      x_1_2 = newark["poet-demo::random-int"](255);
+      x_1_3 = newark["poet-demo::random-int"](255);
       x_1_0 = ("rgb(" + x_1_1 + "," + x_1_2 + "," + x_1_3 + ")");
     };
     return x_1_0;
   });
-  newark["poet-page::random-color"][":name"] = "random-color";
-  newark["poet-page::tau"] = (newark["core::js"]["Math"]["PI"] * 2);
-  newark["poet-page::make-balls"] = (function (a_1_0) {
+  newark["poet-demo::random-color"][":name"] = "random-color";
+  newark["poet-demo::tau"] = (newark["core::js"]["Math"]["PI"] * 2);
+  newark["poet-demo::make-balls"] = (function (a_1_0) {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6, x_1_7, x_1_8, x_1_9, x_1_10, x_1_11, x_1_12, x_1_13, x_1_14, x_1_15;
     label_1_0:{
       x_1_2 = a_1_0;
@@ -2183,37 +2183,37 @@ if (typeof require != 'undefined') {
           break label_1_1;
         };
         x_1_6 = x_1_3;
-        x_1_7 = newark["poet-page::random-int"](newark["poet-page::max-radius"], newark["poet-page::min-radius"]);
-        x_1_8 = newark["poet-page::random-int"](newark["poet-page::max-mass"], newark["poet-page::min-mass"]);
-        x_1_9 = newark["poet-page::random"](newark["poet-page::max-speed"], newark["poet-page::min-speed"]);
-        x_1_10 = newark["poet-page::random"](newark["poet-page::max-speed"], newark["poet-page::min-speed"]);
-        x_1_12 = (newark["poet-page::-width"] - x_1_7);
-        x_1_11 = newark["poet-page::random"](x_1_7, x_1_12);
-        x_1_14 = (newark["poet-page::-height"] - x_1_7);
-        x_1_13 = newark["poet-page::random"](x_1_7, x_1_14);
-        x_1_15 = newark["poet-page::random-color"]();
+        x_1_7 = newark["poet-demo::random-int"](newark["poet-demo::max-radius"], newark["poet-demo::min-radius"]);
+        x_1_8 = newark["poet-demo::random-int"](newark["poet-demo::max-mass"], newark["poet-demo::min-mass"]);
+        x_1_9 = newark["poet-demo::random"](newark["poet-demo::max-speed"], newark["poet-demo::min-speed"]);
+        x_1_10 = newark["poet-demo::random"](newark["poet-demo::max-speed"], newark["poet-demo::min-speed"]);
+        x_1_12 = (newark["poet-demo::-width"] - x_1_7);
+        x_1_11 = newark["poet-demo::random"](x_1_7, x_1_12);
+        x_1_14 = (newark["poet-demo::-height"] - x_1_7);
+        x_1_13 = newark["poet-demo::random"](x_1_7, x_1_14);
+        x_1_15 = newark["poet-demo::random-color"]();
         newark["model::make-model"](x_0_1, x_0_2, x_1_7, x_0_3, x_1_8, x_0_4, x_1_9, x_0_5, x_1_10, x_0_6, x_1_11, x_0_7, x_1_13, x_0_8, x_1_15, x_0_9, 0.5);
         x_1_3 = (x_1_3 + 1);
       };
     };
     return x_1_0;
   });
-  newark["poet-page::make-balls"][":name"] = "make-balls";
-  newark["poet-page::init"] = (function () {
+  newark["poet-demo::make-balls"][":name"] = "make-balls";
+  newark["poet-demo::init"] = (function () {
     var x_1_0;
     label_1_0:{
-      newark["poet-page::canvas"] = newark["dom::html"]([x_0_10]);
-      newark["core::js"]["document"]["body"]["appendChild"](newark["poet-page::canvas"]);
-      newark["poet-page::resize!"]();
-      x_1_0 = newark["poet-page::make-balls"](newark["poet-page::num-balls"]);
+      newark["poet-demo::canvas"] = newark["dom::html"]([x_0_10]);
+      newark["core::js"]["document"]["body"]["appendChild"](newark["poet-demo::canvas"]);
+      newark["poet-demo::resize!"]();
+      x_1_0 = newark["poet-demo::make-balls"](newark["poet-demo::num-balls"]);
     };
     return x_1_0;
   });
-  newark["poet-page::init"][":name"] = "init";
-  newark["poet-page::draw-ball"] = (function (a_1_0) {
+  newark["poet-demo::init"][":name"] = "init";
+  newark["poet-demo::draw-ball"] = (function (a_1_0) {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6, x_1_7, x_1_8;
     label_1_0:{
-      x_1_1 = newark["poet-page::get-context"]();
+      x_1_1 = newark["poet-demo::get-context"]();
       x_1_2 = a_1_0["attributes"];
       x_1_3 = x_1_2["x-pos"];
       x_1_4 = x_1_2["y-pos"];
@@ -2223,7 +2223,7 @@ if (typeof require != 'undefined') {
       x_1_1["fillStyle"] = x_1_7;
       x_1_8 = x_1_1;
       x_1_8["beginPath"]();
-      x_1_8["arc"](x_1_3, x_1_4, x_1_5, 0, newark["poet-page::tau"], false);
+      x_1_8["arc"](x_1_3, x_1_4, x_1_5, 0, newark["poet-demo::tau"], false);
       x_1_8["closePath"]();
       x_1_8["stroke"]();
       x_1_8["fill"]();
@@ -2231,8 +2231,8 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::draw-ball"][":name"] = "draw-ball";
-  newark["poet-page::draw-balls"] = (function () {
+  newark["poet-demo::draw-ball"][":name"] = "draw-ball";
+  newark["poet-demo::draw-balls"] = (function () {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6;
     label_1_0:{
       x_1_1 = 0;
@@ -2243,7 +2243,7 @@ if (typeof require != 'undefined') {
         x_1_5 = (x_1_1 < x_1_4);
         if (!(x_1_5 == null || x_1_5 === false)) {
           x_1_6 = x_1_2[x_1_1];
-          newark["poet-page::draw-ball"](x_1_6);
+          newark["poet-demo::draw-ball"](x_1_6);
           x_1_1 = (x_1_1 + 1);
         } else {
           x_1_0 = null;
@@ -2253,8 +2253,8 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::draw-balls"][":name"] = "draw-balls";
-  newark["poet-page::move-ball"] = (function (a_1_0) {
+  newark["poet-demo::draw-balls"][":name"] = "draw-balls";
+  newark["poet-demo::move-ball"] = (function (a_1_0) {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6, x_1_7, x_1_8, x_1_9, x_1_10, x_1_11, x_1_12, x_1_13, x_1_14, x_1_15, x_1_16, x_1_17, x_1_18, x_1_19, x_1_20, x_1_21, x_1_22;
     label_1_0:{
       x_1_1 = a_1_0["attributes"];
@@ -2263,9 +2263,9 @@ if (typeof require != 'undefined') {
       x_1_4 = x_1_1["y-pos"];
       x_1_5 = x_1_1["x-vel"];
       x_1_6 = x_1_1["y-vel"];
-      x_1_8 = (x_1_5 * newark["poet-page::-step"]);
+      x_1_8 = (x_1_5 * newark["poet-demo::-step"]);
       x_1_7 = (x_1_3 + x_1_8);
-      x_1_10 = (x_1_6 * newark["poet-page::-step"]);
+      x_1_10 = (x_1_6 * newark["poet-demo::-step"]);
       x_1_9 = (x_1_4 + x_1_10);
       x_1_12 = (x_1_7 - x_1_2);
       x_1_11 = (x_1_12 < 0);
@@ -2275,11 +2275,11 @@ if (typeof require != 'undefined') {
         x_1_7 = x_1_2;
       } else {
         x_1_15 = (x_1_7 + x_1_2);
-        x_1_14 = (x_1_15 > newark["poet-page::-width"]);
+        x_1_14 = (x_1_15 > newark["poet-demo::-width"]);
         if (!(x_1_14 == null || x_1_14 === false)) {
           x_1_16 = (- x_1_5);
           newark["model::set"](a_1_0, x_0_4, x_1_16);
-          x_1_7 = (newark["poet-page::-width"] - x_1_2);
+          x_1_7 = (newark["poet-demo::-width"] - x_1_2);
         };
       };
       x_1_18 = (x_1_9 - x_1_2);
@@ -2290,11 +2290,11 @@ if (typeof require != 'undefined') {
         x_1_9 = x_1_2;
       } else {
         x_1_21 = (x_1_9 + x_1_2);
-        x_1_20 = (x_1_21 > newark["poet-page::-height"]);
+        x_1_20 = (x_1_21 > newark["poet-demo::-height"]);
         if (!(x_1_20 == null || x_1_20 === false)) {
           x_1_22 = (- x_1_6);
           newark["model::set"](a_1_0, x_0_5, x_1_22);
-          x_1_9 = (newark["poet-page::-height"] - x_1_2);
+          x_1_9 = (newark["poet-demo::-height"] - x_1_2);
         };
       };
       newark["model::set"](a_1_0, x_0_6, x_1_7);
@@ -2302,8 +2302,8 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::move-ball"][":name"] = "move-ball";
-  newark["poet-page::move-balls"] = (function () {
+  newark["poet-demo::move-ball"][":name"] = "move-ball";
+  newark["poet-demo::move-balls"] = (function () {
     var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6;
     label_1_0:{
       x_1_1 = 0;
@@ -2314,7 +2314,7 @@ if (typeof require != 'undefined') {
         x_1_5 = (x_1_1 < x_1_4);
         if (!(x_1_5 == null || x_1_5 === false)) {
           x_1_6 = x_1_2[x_1_1];
-          newark["poet-page::move-ball"](x_1_6);
+          newark["poet-demo::move-ball"](x_1_6);
           x_1_1 = (x_1_1 + 1);
         } else {
           x_1_0 = null;
@@ -2324,43 +2324,43 @@ if (typeof require != 'undefined') {
     };
     return x_1_0;
   });
-  newark["poet-page::move-balls"][":name"] = "move-balls";
-  newark["poet-page::render"] = (function () {
+  newark["poet-demo::move-balls"][":name"] = "move-balls";
+  newark["poet-demo::render"] = (function () {
     var x_1_0, x_1_1;
     label_1_0:{
-      newark["poet-page::resize!"]();
-      x_1_1 = newark["poet-page::get-context"]();
-      x_1_1["clearRect"](0, 0, newark["poet-page::-width"], newark["poet-page::-height"]);
-      x_1_0 = newark["poet-page::draw-balls"]();
+      newark["poet-demo::resize!"]();
+      x_1_1 = newark["poet-demo::get-context"]();
+      x_1_1["clearRect"](0, 0, newark["poet-demo::-width"], newark["poet-demo::-height"]);
+      x_1_0 = newark["poet-demo::draw-balls"]();
     };
     return x_1_0;
   });
-  newark["poet-page::render"][":name"] = "render";
-  newark["poet-page::update"] = (function () {
+  newark["poet-demo::render"][":name"] = "render";
+  newark["poet-demo::update"] = (function () {
     var x_1_0;
     label_1_0:{
-      x_1_0 = newark["poet-page::move-balls"]();
+      x_1_0 = newark["poet-demo::move-balls"]();
     };
     return x_1_0;
   });
-  newark["poet-page::update"][":name"] = "update";
-  newark["poet-page::main"] = (function () {
+  newark["poet-demo::update"][":name"] = "update";
+  newark["poet-demo::main"] = (function () {
     var x_1_0;
     label_1_0:{
-      newark["poet-page::update"]();
-      x_1_0 = newark["poet-page::render"]();
+      newark["poet-demo::update"]();
+      x_1_0 = newark["poet-demo::render"]();
     };
     return x_1_0;
   });
-  newark["poet-page::main"][":name"] = "main";
+  newark["poet-demo::main"][":name"] = "main";
   x_0_12 = newark["core::js"]["onload"];
   newark["core::js"]["onload"] = (function () {
     var x_1_0, x_1_1;
     if (!(x_0_12 == null || x_0_12 === false)) {
       x_0_12();
     };
-    newark["poet-page::init"]();
-    newark["core::js"]["setInterval"](newark["poet-page::main"], 2);
+    newark["poet-demo::init"]();
+    newark["core::js"]["setInterval"](newark["poet-demo::main"], 2);
     x_1_1 = newark["model::get-collection"](x_0_1);
     x_1_0 = newark["core::js"]["console"]["log"](x_1_1);
     return x_1_0;
