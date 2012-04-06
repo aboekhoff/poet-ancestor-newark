@@ -3,6 +3,9 @@
 (define reader-macros (object))
 (define dispatch-reader-macros (object))
 
+(define eof (object))
+(define (eof? x) (= x EOF))
+
 (define (eof-error! msg)
   (let ((e (js.Error (or msg "EOF"))))
     (set! e :recoverable #t)
@@ -32,7 +35,7 @@
 (define constituent-regex (js.RegExp "#"))
 
 (define (terminal? x)
-  (or (nil? x)
+  (or (eof? x)
       (.test whitespace-regex x)
       (. reader-macros x)))
 
@@ -73,12 +76,13 @@
     (set! :column position.column)))
 
 (define (peek-char reader)
-  (when (< reader.offset reader.input.length)
-        (. reader.input reader.offset)))
+  (if (< reader.offset reader.input.length)
+      (. reader.input reader.offset)'
+      eof))
 
 (define (read-char reader)
-  (let ((c (peek-char reader)))
-    (when c
+  (let ((c (peek-char reader)))    
+    (unless (eof? c)
       (doto reader
         (set! :last-offset reader.offset)
         (set! :last-line   reader.line)
@@ -101,7 +105,7 @@
   (let ((in-comment? #f))
     (loop
      (case (read-char reader)
-       (#nil  (return))
+       (eof   (return))
        (" ")
        ("\t")
        ("\b")
@@ -114,6 +118,9 @@
           (unread-char reader)
           (return)))))))
 
+(define (reader-macro-char? c)
+  (has-property? c reader-macros))
+
 (define (invoke-reader-macro c reader)
   (let ((macro (. reader-macros c)))
     (when macro (macro reader))))
@@ -121,9 +128,10 @@
 (define (read-form reader)
   (read-whitespace reader)
   (let ((c (peek-char reader)))
-    (when c
-      (or (invoke-reader-macro c reader)
-          (read-atom reader)))))
+    (cond
+     ((eof? c)               c)
+     ((reader-macro-char? c) ((. reader-macros c) reader))
+     (:else                  (read-atom reader)))))
 
 (define (read-chars-until predicate reader)
   (let ((chars []))
@@ -172,7 +180,7 @@
     (loop
      (let ((c (read-char reader)))
        (case c
-         (#nil  (eof-error!
+         (eof   (eof-error!
                  (print-str "unclosed string literal at" pos)))
          ("\""  (return))
          ("\\"  (.push chars (escape-char (read-char reader))))
@@ -199,7 +207,8 @@
      (cond
       ((predicate reader) (return))
       ((let ((form (read-form reader)))
-         (unless form (eof-error! (print-str eof-message "at" pos)))
+         (when (eof? form)
+               (eof-error! (print-str eof-message "at" pos)))
          (.push forms form)))))
     forms))
 
@@ -254,6 +263,6 @@
   (set! "n"  (make-literal-reader "nil" #nil))
   (set! "t"  (make-literal-reader "t"   #t))
   (set! "f"  (make-literal-reader "f"   #f))
-  (set! "v"  (make-literal-reader "void" ((fn (_)))))
+  (set! "v"  (make-literal-reader "void" ((fn (_) _))))
   (set! "/"  read-regex-literal)
   (set! "\"" read-heredoc))

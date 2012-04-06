@@ -2,6 +2,7 @@
 (import poet/reader)
 (import poet/env)
 (import poet/expander)
+(import poet/syntax :prefix s/)
 
 (define-syntax with-spy
   ((with-spy header xs ...)
@@ -33,7 +34,7 @@
  (terminal? ")")
  (not-constituent? ")")
  (read-form (Reader "(1 2 3 4 5 6)"))
- (read-form (Reader "[ a b (1 :foo 2 :bar 3 [4 5] 6) ]")))
+ (read-form (Reader "[ a b (1 :foo 2 :bar 3 [4 5] 6) #t #f #nil]")))
 
 (with-spy "to-key-sanity-check"
   (to-key "foo")
@@ -66,3 +67,21 @@
  (intern e0 [:LABEL 'foo] 'foo)
  (lookup e0 [:LABEL 'foo]))
 
+(with-spy "syntax-rules-sanity-check"
+  (s/match 'x   42)
+  (s/match '(x) '(42))
+  (s/match '[x] '[42])
+  (s/match 42   42)
+  (s/match 42   43)
+  (s/match :foo :foo)
+  (s/match :foo :bar)
+  (s/match '(x xs ...) '(1 2 3 4 5))
+  (s/match '[x xs ...] [:foo :bar :baz :zonk])
+  
+  ((s/make-matcher
+    '(((:foo x xs ...) (xs ... x))))
+   '(:foo 1 2 3 4 5 6))
+
+  ((s/make-matcher
+    '(((:foo x xs ...) (xs ... x))))
+   '(:bar 1 2 3 4 5 6)))

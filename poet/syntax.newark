@@ -1,0 +1,268 @@
+(import prelude)
+(import poet/env)
+
+(define (dots? x)
+  (and (symbol? x) (= x.name "...")))
+
+(define dots-key (to-key "..."))
+
+(define (quoted-dots? x)
+  (and (list? x)
+       (= (len x) 2)
+       (every? dots? x)))
+
+(define (extract-symbols pat)
+  (define acc (object))
+  (define (push x)
+    (let ((k (to-key x)))
+      (if (has-property? k acc)
+          (throw
+           (js.Error
+            "repeated identifier in syntax pattern"))
+          (set! (. acc k) #t))))
+  (extract-symbols* pat push)
+  acc)
+
+(define (extract-symbols* pat push)
+  (cond    
+   ((symbol? pat) (when (not (dots? pat)) (push pat)))
+   ((list? pat)   (do-list  (x pat) (extract-symbols* x push)))
+   ((array? x)    (do-array (x pat) (extract-symbols* x push)))))
+
+(define (make-free-predicate pat)
+  (let ((dict (extract-symbols pat)))
+    (fn (x) (has-property? (to-key x) dict))))
+
+(define (bind* x k v)
+  (let ((k* (to-key k)))
+    (when (not (. x k*))
+          (set! (. x k*) []))
+    (.push (. x k*) v)))
+
+(define (bind x k v)
+  (let ((k* (to-key k)))
+    (set! (. x k*) v)))
+
+(define (match x y dict binder)
+  (let* ((binder (or binder bind))
+         (dict   (or dict (object)))
+         (bind   (fn (x y) (binder dict x y)))
+         (fail (fn () (return-from match #nil))))
+    (match-sexp x y bind fail)
+    dict))
+
+(define (match-sexp x y bind fail)
+  (cond
+   ((symbol? x)
+    (bind x y))
+   
+   ((array? x)
+    (unless (array? y) (fail))
+    (match-list (array->list x) (array->list y) bind fail))
+   
+   ((list? x)
+    (unless (list? y) (fail))
+    (match-list x y bind fail))
+   
+   (:else
+    (unless (= x y) (fail)))))
+
+(define (match-dots x ys)
+  (let ((dict (object)))
+    (loop
+     (if (or (empty? ys)
+             (not (match x (first ys) dict bind*)))
+         (return)
+         (set! ys (rest ys))))
+    [dict ys]))
+
+(define (match-list x y bind fail)  
+  (cond
+   ((empty? x) (unless (empty? y) (fail)))
+   ((dots? (second x))
+    (let* ((result    (match-dots (first x) y))
+           (matches   result.0)
+           (remainder result.1))
+      (match-list (drop 2 x) remainder bind fail)
+      (bind "..." matches)))
+   (:else
+    (match-sexp (first x) (first y) bind fail)
+    (match-list (rest x)  (rest y)  bind fail))))
+
+(define (compile tmp free?)
+  (cond
+   ((symbol? tmp)
+    (if (free? tmp)
+        [:GET (to-key tmp)]
+        [:ATOM tmp]))
+   
+   ((list? tmp)
+    (cond
+     ((empty? tmp)
+      [:LIST []])
+
+     ; ((quoted-dots? tmp)
+     ; [:ATOM (first tmp)])
+
+     ((= :identifier->string (first tmp))
+      (let ((sym (second tmp)))
+        (if (free? sym)
+            [:NAME sym]
+            [:PUT (pr-str sym)])))
+
+     (:else
+      [:LIST (compile-list tmp free?)])))
+
+   ((array? tmp)
+    (if (empty? tmp)
+        [:ARRAY []]
+        [:ARRAY (compile-list (array->list tmp) free?)]))
+
+   (:else
+    [:ATOM tmp])))
+
+(define (compile-list xs free?)
+  (define ys (reverse xs))
+  (define result [])
+  (define (compile-1)
+    (let ((y (first ys)))
+      (set! ys (rest ys))
+      (if (dots? y)
+          [:SPLICE (compile-1)]
+          (compile y free?))))
+  (loop
+   (if (empty? ys)
+       (return)
+       (.push result (compile-1))))
+  (reverse result))
+
+(define (expand tmp dict)
+  (let* ((put (fn (x) (return-from expand x)))
+         (get (fn (x) (. dict x))))
+    (expand* tmp put get)))
+
+(define (expand* tmp put get)
+  (let ((tag tmp.0))
+    (case tag
+      (:ATOM  (put tmp.1))
+      (:GET   (put (get tmp.1)))
+      (:LIST  (put (array->list (expand-array tmp.1 get))))
+      (:ARRAY (put (expand-array tmp.1 get))))))
+
+(define (expand-array xs get)
+  (let* ((result [])
+         (put (fn (x) (.push result x))))
+    (do-array (x xs)
+      (let ((tag x.0))
+        (case tag
+          (:SPLICE (expand-splice x.1 put get))
+          (:else   (expand* x put get)))))
+    result))
+
+(define (expand-splice x put get)
+  (define dict (get (to-key "...")))
+  (define index 0)
+  (define (get* key)
+    (let ((arr (. dict key)))
+      (if (and arr (< index (len arr)))
+          (. arr index)
+          (return-from expand-splice))))
+  (loop
+   (expand* x put get*)
+   (inc! index)))
+
+(define (prepare pair)
+  (let* ((pattern   (first pair))
+         (template  (second pair))
+         (free?     (make-free-predicate pattern))
+         (template* (compile template free?)))
+    [pattern template*]))
+
+(define (make-error-fn patterns)
+  (let ((patterns* (.join (map pr-str (to-array patterns)) "\n  ")))
+    (fn (input)
+        (throw (js.Error
+                (+ "no match found for input\n"
+                   "  " (pr-str input) "\n"
+                   "among patterns\n  "
+                   patterns*))))))
+
+(define (make-matcher pairs)
+  (define fail   (make-error-fn (map first pairs)))
+  (define pairs* (map prepare pairs))  
+  (define (matcher input)    
+    (do-list (pair pairs*)
+      (let* ((pattern  pair.0)
+             (template pair.1)
+             (matches (match pattern input)))
+        (when matches
+          (return-from matcher (expand template matches)))))
+    (fail input))
+  matcher)
+
+(define (make-syntax-rule pairs env)
+  (define pairs*
+    (map (fn (x) (list (rest (first x)) (second x))) pairs))
+  (define matcher (make-matcher pairs*))
+  (fn (input)
+      (let ((tag (make-tag env)))
+        (sanitize (matcher (sanitize (rest input) tag)) tag))))
+
+(define (adhoc-test)
+
+  (define m1
+    (make-matcher
+     '(
+       ((_ foo bar baz)
+        (baz bar foo))
+       )
+     )
+    )
+
+  (define m2
+    (make-matcher
+     '(
+       ((_ (x y) ...)
+        ((x ...) (y ...)))
+       )
+     )
+    )
+
+  (define m3
+    (make-matcher
+     '(
+       ((_ (x xs ...) ...)
+        ((:WHAM! xs ... x) ...))
+       )
+     )
+    )
+
+  (define m4
+    (make-matcher
+     '(
+       ((let* () body ...)
+        (let () body ...))
+       
+       ((let* ((var val) more ...) body ...)
+        (let ((var val)) (let* (more ...) body ...))))
+     )
+    )
+
+  ;(prn (compile '((x ...) (y ...)) (fn () #f)))
+
+  (prn (match '(x) '(a b)))
+  (prn (match '(x xs ...) '(a b c d e f g)))
+  (prn (reverse '(a b c d e f g)))
+  (prn (reverse '[a  b c d e g]))
+
+
+  (prn (m1 '(1 2 3)))
+
+  (prn (m2 '((a b) (c d) (e f) (g h))))
+
+  (prn (m3 '((a 1 2 3 4) (b 2 3 4 5) (c 6 7 8 9))))
+
+  (prn (m4 '(let* () wtf? wtf? wtf?)))
+
+  (prn (m4 '(let* ((x 1)) (* x x))))
+)
