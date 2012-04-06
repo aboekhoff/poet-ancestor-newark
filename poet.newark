@@ -2,7 +2,7 @@
 (import poet/reader)
 (import poet/env)
 
-(define (p))
+(define (p) )
 
 (define-syntax spy
   ((spy x)
