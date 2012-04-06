@@ -1,0 +1,463 @@
+(import prelude)
+(import poet/env)
+
+(define-syntax comment
+  ((comment _ ...)
+   #nil))
+
+(define (make-macro transformer)
+  (set! transformer :__POET_MACRO__ #t)
+  transformer)
+
+(define (macro? e x)
+  (let ((m (lookup e x)))
+    (and m (. m :__POET_MACRO__))))
+
+(define (make-symbol-macro transformer)
+  (set! transformer :__POET_SYMBOL_MACRO__ #t)
+  transformer)
+
+(define (symbol-macro? e x)
+  (let ((m (lookup e x)))
+    (and m (. m :__POET_SYMBOL_MACRO__))))
+
+(define (make-special-form transformer)
+  (set! transformer :__POET_SPECIAL_FORM__ #t)
+  transformer)
+
+(define (special-form? e x)
+  (let ((m (lookup e x)))
+    (and m (. m :__POET_SPECIAL_FORM__))))
+
+(comment
+
+ (define-type LexicalEnv  (package bindings))
+ (define-type LexicalTag  (env id))
+ (define-type Macro       (transformer))
+ (define-type SymbolMacro (transformer))
+ (define-type SpecialForm (name transformer))
+
+
+ (define *special-forms* (js.Object))
+
+ (define-syntax special-form
+   ((special-form name)
+    (. *special-forms* (:identifier->string name))))
+
+ (define (special-form? x)
+   (instanceof x SpecialForm))
+
+ (define (macro? x)
+   (instanceof x Macro))
+
+ (define (symbol-macro? x)
+   (instanceof x SymbolMacro))
+
+ (define (lexical-env? x)
+   (instanceof x LexicalEnv))
+
+ (define (make-env package parent)
+   (let ((bindings
+          (if parent
+              (cons (js.Object) parent.bindings)
+              (list (js.Object)))))
+     (new LexicalEnv package bindings)))
+
+ (define (extend-env env)
+   (assert (lexical-env? env))
+   (new LexicalEnv env.package (cons (js.Object) env.bindings)))
+
+ (define (lookup-key bindings key)
+   (assert (list? bindings))
+   (assert (string? key))
+   (do-list (obj bindings)
+            (let ((val (. obj key)))
+              (when val (return-from lookup-key val)))))
+
+ (define (lookup-symbol env sym)
+   (when (symbol? sym)
+         (if (qualified-symbol? sym)
+             (lookup-symbol (get-package sym.package)
+                            (new Symbol sym.name))
+             (or (lookup-key env.bindings (symbol->key sym))
+                 (when (tagged-symbol? sym)
+                       (lookup-symbol sym.tag.env sym.child))))))
+
+ (define (lookup-label env label)
+   (or (lookup-key env.bindings (label->key label))
+       (when (tagged-symbol? label)
+             (lookup-label sym.tag.env sym.child))))
+
+ (define (env-bind env key val)
+   (set! (. env.bindings.head key) val)
+   val)
+
+ (define (bind-symbol env sym val)
+   (assert (lexical-env? env))
+   (assert (symbol? sym))
+   (assert (not (qualified-symbol? sym)))
+   (env-bind env (symbol->key sym) val))
+
+ (define (bind-local env sym)
+   (let ((sym (if (tagged-symbol? sym)
+                  (new Symbol (symbol->key sym))
+                  sym)))
+     (bind-symbol env sym sym)))
+
+ (define (bind-label env lab)
+   (let* ((lab
+           (if (tagged-symbol? sym)
+               (new Symbol (symbol->key lab))           
+               lab)))
+     (env-bind env (label->key lab) lab)))
+
+ (define (bind-global env sym)
+   (let ((global (new QualifiedSymbol env.package sym.name)))
+     (bind-symbol env sym global)))
+
+ (define (make-generator)
+   (let ((seed 0))
+     (fn () (inc! seed) seed)))
+
+ (define next-tag-id (make-generator))
+
+ (define (make-tag env)
+   (new LexicalTag env (next-tag-id)))
+
+ (define *packages* (js.Object))
+
+ (define (get-package name)
+   (when (not (. *packages* name))
+         (set! (. *packages* name) (make-env name)))
+   (. *packages* name))
+
+ (define *current-package* (get-package "core"))
+
+ (define (begin? e x)
+   (and (list? x)
+        (= (special-form begin) (lookup-symbol e (first x)))))
+
+ (define (define? e x)
+   (and (list? x)
+        (= (special-form define) (lookup-symbol e (first x)))))
+
+ (define-generic symbol->key (x))
+
+ (define-syntax lazy-getter
+   ((lazy-getter (obj field) body ...)
+    (fn (obj)
+        (or (. obj field)
+            (begin
+              (set! (. obj field) (begin body ...))
+              (. obj field))))))
+
+ (extend-generic symbol->key
+                 (Symbol
+                  (lazy-getter (x "key") (+ ":" x.name)))  
+                 
+                 (QualifiedSymbol
+                  (lazy-getter (x "key") (+ ":" x.name)))
+
+                 (TaggedSymbol
+                  (lazy-getter (x "key") (+ "$" x.tag.id (symbol->key x.child)))))
+
+ (define (label->key label)
+   (+ "#[label]"
+      (cond
+       ((nil? label)     "#nil")
+       ((keyword? label) (+ "#[keyword]" label.name))
+       ((symbol? label)  (symbol->key label)))))
+
+ (define-generic sanitize (form tag))
+
+ (extend-generic sanitize
+                 (Symbol
+                  (fn (x t) (new TaggedSymbol x t)))
+                 
+                 (QualifiedSymbol
+                  (fn (x _) x))
+
+                 (TaggedSymbol
+                  (fn (x t)
+                      (if (= t x.tag) x.child (new TaggedSymbol x t))))
+
+                 (List
+                  (fn (x t) (map (fn (x) (sanitize x t)) x)))
+
+                 (Array
+                  (fn (x t) (map (fn (x) (sanitize x t)) x)))
+
+                 (:default
+                  (fn (x _) x)))
+
+ (define (macroexpand-1 e x)
+   (cond 
+    ((symbol? x)
+     (let ((macro (lookup-symbol e x)))
+       (if (symbol-macro? macro)
+           (.transform macro e x)
+           x)))
+    ((list? x)
+     (let ((macro (lookup-symbol e (first x))))
+       (if (macro? macro)
+           (.transform macro e x)
+           x)))
+    (:else x)))
+
+ (define (macroexpand e x)
+   (let ((y (macroexpand-1 e x)))
+     (if (= x y) y (macroexpand e y))))
+
+ (define (expand* e xs)
+   (map (fn (x) (expand e x)) xs))
+
+ (define (expand e x)
+   (let ((x (macroexpand e x)))
+     (cond
+      ((symbol? x) (expand-symbol e x))
+      ((list? x)   (expand-list e x))
+      ((array? x)  (expand* e x))
+      (#t          x))))
+
+ (define (expand-symbol e x)
+   (let ((val (lookup-symbol e x)))
+     (cond
+      ((not val)
+       (bind-global e x))
+      ((special-form? val)
+       (expand-error x "can't take value of special form"))
+      ((macro? val)
+       (expand-error x "can't take value of macro"))
+      ((symbol-macro? val)
+       (expand-error x "can't take value of symbol-macro"))
+      (:else x))))
+
+ (define (expand-list e x)
+   (let ((head (lookup-symbol e (first x))))
+     (if (special-form? head)
+         (.transformer head e x)
+         (expand-call e x))))
+
+ (define (validate-arglist arglist)
+   (let ((xs (list->array arglist)))
+     (do-array (x i xs)
+               (assert (symbol? x) "arglists must contain symbols only") 
+               (when (= "." x.name)
+                     (assert (= xs.length (+ i 2))
+                             (+ "malformed arglist: " (pr-str arglist)))))))
+
+ (define (bind-arglist e xs)
+   (validate-arglist xs)
+   (let ((ys []))
+     (do-list (x xs)
+              (if (not (= x.name "."))
+                  (.push ys (bind-local e x))
+                  (.push ys x)))
+     (array->list ys)))
+
+ (define front-dotted-regex
+   (js.RegExp "\\.[^\\.]+"))
+
+ (define (front-dotted? e x)
+   (and (symbol? x)
+        (.test front-dotted-regex (pr-str x))))
+
+ (define (expand-call e x)
+   (if (front-dotted? x)
+       (let ((field (.substring (pr-str x) 1))
+             (obj   (expand e (second x)))
+             (args  (expand* e (drop 2 x))))
+         (cons (list 'core::. obj field) args))
+       (expand* e x)))
+
+ (define (flatten-body e body)
+   (define result [])
+   (loop
+    (when (empty? body) (return result))
+    (let ((form (macroexpand e (first body))))
+      (if (begin? e form)
+          (set! body (append (rest form) body))
+          (begin (.push result form)
+                 (set! body (rest body)))))))
+
+ (define (collect-defines e body)
+   (define defs [])
+   (loop
+    (let ((form (first body)))
+      (if (define? e form)
+          (begin
+            (.push defs (list (second form) (third form)))
+            (set! body (rest body)))
+          (return [defs body])))))
+
+ (define (expand-body e body)
+   (let* ((body      (flatten-body e body))
+          (defs+body (collect-defines e body))
+          (defs      (first defs+body))
+          (body      (second defs+body))
+                                        ;(_ (prn "DEFS:" defs))
+                                        ;(_ (prn "BODY:" body))
+          )
+     (if (empty? defs)
+         (case (len body)
+           (0     #nil)
+           (1     (expand e (first body)))
+           (:else (apply list 'core::begin (expand* e body))))
+         (expand-letrec e (array->list defs) body))))
+
+ (define (expand-let e bindings body)
+   (let* ((exprs      (map (fn (x) (expand e (second x))) bindings))
+          (e*         (extend-env e))
+          (vars       (map (fn (x) (bind-local e* (first x))) bindings))
+          (bindings*  (map* list vars exprs))
+          (body       (expand-body e* body)))
+     (list 'core::let (map* list vars exprs) body)))
+
+ (define (expand-letrec e bindings body)
+   (let* ((e*    (extend-env e))
+          (vars  (map (fn (x) (bind-local e* (first x))) bindings))
+          (exprs (map (fn (x) (expand e* (second x))) bindings))
+          (body  (expand-body e* body)))
+     (list 'core::letrec (map* list vars exprs) body)))
+
+ (define-syntax define-special-form
+   ((define-special-form (name env form) body ...)
+    (begin
+      (set! (. *special-forms* (:identifier->string name))
+            (new SpecialForm
+                 (:identifier->string name)
+                 (fn (env form) body ...)))
+      (bind-symbol
+       (get-package "core")
+       (new Symbol (:identifier->string name))
+       (. *special-forms* (:identifier->string name))))))
+
+ (define-special-form
+   (define e x)
+   (throw
+    (js.Error
+     (+ "definition in expression context: "
+        (pr-str x)))))
+
+ (define-special-form
+   (define-macro e x)
+   (throw
+    (js.Error
+     (+ "internal define-macro: "
+        (pr-str x)))))
+
+ (define-special-form
+   (define-symbol-macro e x)
+   (throw
+    (js.Error
+     (+ "internal define-symbol-macro: "
+        (pr-str x)))))
+
+ (define-special-form
+   (eval-when-compile e x)
+   (expand-body e (rest x)))
+
+ (define-special-form
+   (let e x)
+   (expand-let e (second x) (drop 2 x)))
+
+ (define-special-form
+   (letrec e x)
+   (expand-letrec (second x) (drop 2 x)))
+
+ (define-special-form
+   (let-macro e x)
+   #nil)
+
+ (define-special-form
+   (let-symbol-macro e x)
+   #nil)
+
+ (define-special-form
+   (if e x)
+   (list 'core::if
+         (expand e (second x))
+         (expand e (third x))
+         (expand e (fourth x))))
+
+ (define-special-form
+   (. e x)
+   (list 'core::.
+         (expand e (second x))
+         (expand e (third x))))
+
+ (define-special-form
+   (begin e xs)
+   (expand-body e (rest xs)))
+
+ (define-special-form
+   (block e xs)
+   (let* ((label (second xs))
+          (body  (drop 2 xs))
+          (e     (extend-env e)))
+     (bind-label e label)
+     (list 'core::block label (expand-body e body))))
+
+                                        ; (do-properties :label (property object) body ...)
+
+ (define-special-form
+   (do-properties* e x)
+   (let* ((label   (second x))
+          (var+obj (third x))
+          (body    (drop 3 x))
+          (obj     (expand e (second var+obj)))
+          (e       (extend-env e))
+          (label   (bind-label e label))
+          (var     (bind-local e (first var+obj)))
+          (body    (expand-body e body)))
+     (list 'core::do-properties* label (list var obj) body)))
+
+ (define-special-form
+   (loop* e xs)
+   (let* ((label (second xs))
+          (body  (drop 2 xs))
+          (e     (extend-env e)))
+     (bind-label e label)
+     (list 'core::loop* label (expand-body e body))))
+
+ (define-special-form
+   (return-from e x)
+   (let* ((label (second x))
+          (value (third x)))
+     (list 'core::return-from
+           (lookup-label e label)
+           (expand e value))))
+
+ (define-special-form
+   (fn e x)
+   (let* ((e       (extend-env e))
+          (arglist (bind-arglist e (second x)))
+          (body    (expand-body e (drop 2 x))))
+     (list 'core::fn arglist body)))
+
+ (define-special-form
+   (method e x)
+   (let* ((e       (extend-env e))
+          (arglist (second x))
+          (this    (bind-symbol e (first arglist)))
+          (arglist (bind-arglist e (rest arglist)))
+          (body    (expand-body e body)))
+     (list 'core::method (cons this arglist) body)))
+
+ (define-special-form
+   (quote e x)
+   (list 'core::quote x))
+
+ (define-special-form
+   (new e x)
+   (cons 'core::new (expand* e (rest x))))
+
+ (define-special-form
+   (throw e x)
+   (list 'core::throw (expand e (second x))))
+
+ (define-special-form
+   (unwind-protect e x)
+   (let ()))
+
+)

@@ -727,17 +727,21 @@ if (typeof require != 'undefined') {
   });
   newark["prelude::get-typename"][":name"] = "get-typename";
   newark["prelude::represent-properties"] = (function (a_1_0, a_1_1, a_1_2) {
-    var x_1_0, x_1_1, x_1_2, x_1_3;
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
     label_1_0:{
-      label_1_1:for(x_1_1 in a_1_0) {
-        x_1_2 = a_1_0["hasOwnProperty"](x_1_1);
-        if (!(x_1_2 == null || x_1_2 === false)) {
-          a_1_1(" [");
-          x_1_3 = newark["core::js"]["JSON"]["stringify"](x_1_1);
-          a_1_1(x_1_3);
-          a_1_1(" ");
-          newark["prelude::represent"](a_1_0[x_1_1], a_1_1, a_1_2, newark["prelude::?"]);
-          x_1_0 = a_1_1("]");
+      x_1_1 = false;
+      label_1_1:for(x_1_2 in a_1_0) {
+        x_1_3 = a_1_0["hasOwnProperty"](x_1_2);
+        if (!(x_1_3 == null || x_1_3 === false)) {
+          if (!(x_1_1 == null || x_1_1 === false)) {
+            a_1_1(", ");
+          } else {
+            x_1_1 = true;
+          };
+          x_1_4 = newark["core::js"]["JSON"]["stringify"](x_1_2);
+          a_1_1(x_1_4);
+          a_1_1(": ");
+          x_1_0 = newark["prelude::represent"](a_1_0[x_1_2], a_1_1, a_1_2);
         } else {
           x_1_0 = null;
         };
@@ -747,13 +751,27 @@ if (typeof require != 'undefined') {
   });
   newark["prelude::represent-properties"][":name"] = "represent-properties";
   newark["prelude::represent-object"] = (function (a_1_0, a_1_1, a_1_2) {
-    var x_1_0, x_1_1;
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
     label_1_0:{
-      a_1_1("#<");
-      x_1_1 = newark["prelude::get-typename"](a_1_0);
-      a_1_1(x_1_1);
-      newark["prelude::represent-properties"](a_1_0, a_1_1, a_1_2);
-      x_1_0 = a_1_1(">");
+      x_1_1 = a_1_0["constructor"];
+      x_1_3 = (x_1_1 === newark["core::js"]["Object"]);
+      if (!(x_1_3 == null || x_1_3 === false)) {
+        x_1_2 = x_1_3;
+      } else {
+        x_1_2 = newark["prelude::not"](x_1_1);
+      };
+      if (!(x_1_2 == null || x_1_2 === false)) {
+        a_1_1("#{");
+        newark["prelude::represent-properties"](a_1_0, a_1_1, a_1_2);
+        x_1_0 = a_1_1("}");
+      } else {
+        a_1_1("#<");
+        x_1_4 = newark["prelude::get-typename"](a_1_0);
+        a_1_1(x_1_4);
+        a_1_1(" ");
+        newark["prelude::represent-properties"](a_1_0, a_1_1, a_1_2);
+        x_1_0 = a_1_1(">");
+      };
     };
     return x_1_0;
   });
@@ -1650,6 +1668,283 @@ if (typeof require != 'undefined') {
   return x_0_0;
 })();
 
+// poet/env.newark
+
+(function () {
+  var x_0_0, x_0_1, x_0_2, x_0_3, x_0_4, x_0_5, x_0_6, x_0_7, x_0_8, x_0_9, x_0_10, x_0_11, x_0_12, x_0_13, x_0_14, x_0_15;
+  newark["poet/env::make-generator"] = (function () {
+    var x_1_0, x_1_1;
+    label_1_0:{
+      x_1_1 = 0;
+      x_1_0 = (function () {
+        var x_2_0;
+        x_1_1 = (x_1_1 + 1);
+        x_2_0 = x_1_1;
+        return x_2_0;
+      });
+    };
+    return x_1_0;
+  });
+  newark["poet/env::make-generator"][":name"] = "make-generator";
+  newark["poet/env::next-tag-id"] = newark["poet/env::make-generator"]();
+  x_0_1 = {};
+  newark["poet/env::packages"] = x_0_1;
+  newark["poet/env::Env"] = (function (a_1_0, a_1_1) {
+    var x_1_0, x_1_1, x_1_2;
+    x_1_0 = this;
+    x_1_2 = (x_1_0 instanceof newark["poet/env::Env"]);
+    if (!(x_1_2 == null || x_1_2 === false)) {
+      x_1_0["package"] = a_1_0;
+      x_1_0["bindings"] = a_1_1;
+      x_1_1 = x_1_0;
+    } else {
+      x_1_1 = new newark["poet/env::Env"](a_1_0, a_1_1);
+    };
+    return x_1_1;
+  });
+  newark["poet/env::Env"][":name"] = "Env";
+  newark["poet/env::Tag"] = (function (a_1_0, a_1_1) {
+    var x_1_0, x_1_1, x_1_2;
+    x_1_0 = this;
+    x_1_2 = (x_1_0 instanceof newark["poet/env::Tag"]);
+    if (!(x_1_2 == null || x_1_2 === false)) {
+      x_1_0["env"] = a_1_0;
+      x_1_0["id"] = a_1_1;
+      x_1_1 = x_1_0;
+    } else {
+      x_1_1 = new newark["poet/env::Tag"](a_1_0, a_1_1);
+    };
+    return x_1_1;
+  });
+  newark["poet/env::Tag"][":name"] = "Tag";
+  newark["poet/env::make-tag"] = (function (a_1_0) {
+    var x_1_0, x_1_1;
+    label_1_0:{
+      x_1_1 = newark["poet/env::next-tag-id"]();
+      x_1_0 = new newark["poet/env::Tag"](a_1_0, x_1_1);
+    };
+    return x_1_0;
+  });
+  newark["poet/env::make-tag"][":name"] = "make-tag";
+  newark["poet/env::make-env"] = (function (a_1_0, a_1_1) {
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
+    label_1_0:{
+      x_1_2 = a_1_1;
+      if (!(x_1_2 == null || x_1_2 === false)) {
+        x_1_1 = x_1_2;
+      } else {
+        x_1_4 = {};
+        x_1_3 = x_1_4;
+        x_1_1 = newark["prelude::list"](x_1_3);
+      };
+      x_1_0 = new newark["poet/env::Env"](a_1_0, x_1_1);
+    };
+    return x_1_0;
+  });
+  newark["poet/env::make-env"][":name"] = "make-env";
+  newark["poet/env::get-package"] = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2;
+    label_1_0:{
+      x_1_1 = newark["poet/env::to-name"](a_1_0);
+      x_1_2 = newark["poet/env::packages"][x_1_1];
+      if (!(x_1_2 == null || x_1_2 === false)) {;} else {
+        newark["poet/env::packages"][x_1_1] = newark["poet/env::make-env"](x_1_1);
+      };
+      x_1_0 = newark["poet/env::packages"][x_1_1];
+    };
+    return x_1_0;
+  });
+  newark["poet/env::get-package"][":name"] = "get-package";
+  newark["poet/env::extend"] = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2, x_1_3;
+    label_1_0:{
+      x_1_3 = {};
+      x_1_2 = x_1_3;
+      x_1_1 = newark["prelude::cons"](x_1_2, a_1_0["bindings"]);
+      x_1_0 = new newark["poet/env::Env"](a_1_0["package"], x_1_1);
+    };
+    return x_1_0;
+  });
+  newark["poet/env::extend"][":name"] = "extend";
+  newark["poet/env::lookup*"] = (function (a_1_0, a_1_1, a_1_2) {
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
+    label_1_0:{
+      x_1_1 = a_1_0["bindings"];
+      label_1_1:for(;;) {
+        x_1_2 = (x_1_1["size"] === 0);
+        if (!(x_1_2 == null || x_1_2 === false)) {
+          x_1_0 = null;
+          break label_1_1;
+        };
+        x_1_3 = x_1_1["head"];
+        x_1_4 = x_1_3[a_1_1];
+        if (!(x_1_4 == null || x_1_4 === false)) {
+          x_1_0 = x_1_3[a_1_1];
+          break label_1_0;
+        };
+        x_1_1 = x_1_1["tail"];
+      };
+    };
+    return x_1_0;
+  });
+  newark["poet/env::lookup*"][":name"] = "lookup*";
+  newark["poet/env::lookup"] = (function (a_1_0, a_1_1, a_1_2) {
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6, x_1_7, x_1_8;
+    label_1_0:{
+      x_1_2 = newark["prelude::qualified-symbol?"](a_1_1);
+      if (!(x_1_2 == null || x_1_2 === false)) {
+        x_1_3 = newark["poet/env::get-package"](a_1_1["qualifier"]);
+        x_1_4 = newark["poet/env::to-key"](a_1_1);
+        x_1_1 = newark["poet/env::lookup*"](x_1_3, x_1_4, a_1_2);
+      } else {
+        x_1_1 = null;
+      };
+      if (!(x_1_1 == null || x_1_1 === false)) {
+        x_1_0 = x_1_1;
+      } else {
+        x_1_6 = newark["poet/env::to-key"](a_1_1);
+        x_1_5 = newark["poet/env::lookup*"](a_1_0, x_1_6);
+        if (!(x_1_5 == null || x_1_5 === false)) {
+          x_1_0 = x_1_5;
+        } else {
+          x_1_8 = newark["prelude::tagged-symbol?"](a_1_1);
+          if (!(x_1_8 == null || x_1_8 === false)) {
+            x_1_7 = newark["poet/env::lookup"](a_1_1["tag"]["env"], a_1_1["child"], a_1_2);
+          } else {
+            x_1_7 = null;
+          };
+          if (!(x_1_7 == null || x_1_7 === false)) {
+            x_1_0 = x_1_7;
+          } else {
+            x_1_0 = a_1_2;
+          };
+        };
+      };
+    };
+    return x_1_0;
+  });
+  newark["poet/env::lookup"][":name"] = "lookup";
+  newark["poet/env::intern"] = (function (a_1_0, a_1_1, a_1_2) {
+    var x_1_0, x_1_1, x_1_2;
+    label_1_0:{
+      x_1_1 = newark["prelude::first"](a_1_0["bindings"]);
+      x_1_2 = newark["poet/env::to-key"](a_1_1);
+      x_1_1[x_1_2] = a_1_2;
+    };
+    return x_1_0;
+  });
+  newark["poet/env::intern"][":name"] = "intern";
+  x_0_4 = newark["prelude::next-generic-id"]();
+  x_0_2 = (x_0_4 + ":" + "to-key");
+  x_0_3 = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
+    label_1_0:{
+      x_1_3 = (a_1_0 == null);
+      if (!(x_1_3 == null || x_1_3 === false)) {
+        x_1_1 = newark["prelude::nil-vtable"];
+      } else {
+        x_1_1 = a_1_0;
+      };
+      x_1_4 = x_1_1[x_0_2];
+      if (!(x_1_4 == null || x_1_4 === false)) {
+        x_1_2 = x_1_4;
+      } else {
+        x_1_2 = x_0_3[":default"];
+      };
+      x_1_0 = x_1_2(a_1_0);
+    };
+    return x_1_0;
+  });
+  x_0_3[":name"] = "to-key";
+  x_0_3[":generic-id"] = x_0_2;
+  newark["poet/env::to-key"] = x_0_3;
+  x_0_5 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = "NIL";
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-key"], null, x_0_5);
+  x_0_6 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = ("STRING(" + a_1_0 + ")");
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["String"], x_0_6);
+  x_0_7 = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2;
+    x_1_2 = newark["prelude::map"](newark["poet/env::to-key"], a_1_0);
+    x_1_1 = x_1_2["join"](" ");
+    x_1_0 = ("[" + x_1_1 + "]");
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["Array"], x_0_7);
+  x_0_8 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = ("KEYWORD(" + a_1_0["name"] + ")");
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["prelude::Keyword"], x_0_8);
+  x_0_9 = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2, x_1_3;
+    x_1_1 = a_1_0["key"];
+    if (!(x_1_1 == null || x_1_1 === false)) {;} else {
+      x_1_2 = newark["prelude::tagged-symbol?"](a_1_0);
+      if (!(x_1_2 == null || x_1_2 === false)) {
+        x_1_3 = newark["poet/env::to-key"](a_1_0["child"]);
+        a_1_0["key"] = ("TAG(" + a_1_0["tag"]["id"] + ")" + x_1_3);
+      } else {
+        a_1_0["key"] = ("SYMBOL(" + a_1_0["name"] + ")");
+      };
+    };
+    x_1_0 = a_1_0["key"];
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["prelude::Symbol"], x_0_9);
+  x_0_12 = newark["prelude::next-generic-id"]();
+  x_0_10 = (x_0_12 + ":" + "to-name");
+  x_0_11 = (function (a_1_0) {
+    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
+    label_1_0:{
+      x_1_3 = (a_1_0 == null);
+      if (!(x_1_3 == null || x_1_3 === false)) {
+        x_1_1 = newark["prelude::nil-vtable"];
+      } else {
+        x_1_1 = a_1_0;
+      };
+      x_1_4 = x_1_1[x_0_10];
+      if (!(x_1_4 == null || x_1_4 === false)) {
+        x_1_2 = x_1_4;
+      } else {
+        x_1_2 = x_0_11[":default"];
+      };
+      x_1_0 = x_1_2(a_1_0);
+    };
+    return x_1_0;
+  });
+  x_0_11[":name"] = "to-name";
+  x_0_11[":generic-id"] = x_0_10;
+  newark["poet/env::to-name"] = x_0_11;
+  x_0_13 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = a_1_0;
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["core::js"]["String"], x_0_13);
+  x_0_14 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = a_1_0["name"];
+    return x_1_0;
+  });
+  newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["prelude::Keyword"], x_0_14);
+  x_0_15 = (function (a_1_0) {
+    var x_1_0;
+    x_1_0 = a_1_0["name"];
+    return x_1_0;
+  });
+  x_0_0 = newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["prelude::Symbol"], x_0_15);
+  return x_0_0;
+})();
+
 // poet/reader.newark
 
 (function () {
@@ -2223,459 +2518,408 @@ if (typeof require != 'undefined') {
   return x_0_0;
 })();
 
-// poet/env.newark
+// poet/expander.newark
 
 (function () {
-  var x_0_0, x_0_1, x_0_2, x_0_3, x_0_4, x_0_5, x_0_6, x_0_7, x_0_8, x_0_9, x_0_10, x_0_11, x_0_12, x_0_13, x_0_14;
-  newark["poet/env::make-generator"] = (function () {
-    var x_1_0, x_1_1;
+  var x_0_0, x_0_1, x_0_2, x_0_3;
+  x_0_3 = newark["prelude::make-keyword"]("__POET_SPECIAL_FORM__");
+  x_0_2 = newark["prelude::make-keyword"]("__POET_SYMBOL_MACRO__");
+  x_0_1 = newark["prelude::make-keyword"]("__POET_MACRO__");
+  newark["poet/expander::make-macro"] = (function (a_1_0) {
+    var x_1_0;
     label_1_0:{
-      x_1_1 = 0;
-      x_1_0 = (function () {
-        var x_2_0;
-        x_1_1 = (x_1_1 + 1);
-        x_2_0 = x_1_1;
-        return x_2_0;
-      });
+      a_1_0[x_0_1] = true;
+      x_1_0 = a_1_0;
     };
     return x_1_0;
   });
-  newark["poet/env::make-generator"][":name"] = "make-generator";
-  newark["poet/env::next-tag-id"] = newark["poet/env::make-generator"]();
-  x_0_1 = {};
-  newark["poet/env::packages"] = x_0_1;
-  newark["poet/env::Env"] = (function (a_1_0, a_1_1) {
+  newark["poet/expander::make-macro"][":name"] = "make-macro";
+  newark["poet/expander::macro?"] = (function (a_1_0, a_1_1) {
     var x_1_0, x_1_1, x_1_2;
-    x_1_0 = this;
-    x_1_2 = (x_1_0 instanceof newark["poet/env::Env"]);
-    if (!(x_1_2 == null || x_1_2 === false)) {
-      x_1_0["package"] = a_1_0;
-      x_1_0["bindings"] = a_1_1;
-      x_1_1 = x_1_0;
-    } else {
-      x_1_1 = new newark["poet/env::Env"](a_1_0, a_1_1);
-    };
-    return x_1_1;
-  });
-  newark["poet/env::Env"][":name"] = "Env";
-  newark["poet/env::Tag"] = (function (a_1_0, a_1_1) {
-    var x_1_0, x_1_1, x_1_2;
-    x_1_0 = this;
-    x_1_2 = (x_1_0 instanceof newark["poet/env::Tag"]);
-    if (!(x_1_2 == null || x_1_2 === false)) {
-      x_1_0["env"] = a_1_0;
-      x_1_0["id"] = a_1_1;
-      x_1_1 = x_1_0;
-    } else {
-      x_1_1 = new newark["poet/env::Tag"](a_1_0, a_1_1);
-    };
-    return x_1_1;
-  });
-  newark["poet/env::Tag"][":name"] = "Tag";
-  newark["poet/env::make-tag"] = (function (a_1_0) {
-    var x_1_0, x_1_1;
     label_1_0:{
-      x_1_1 = newark["poet/env::next-tag-id"]();
-      x_1_0 = new newark["poet/env::Tag"](a_1_0, x_1_1);
-    };
-    return x_1_0;
-  });
-  newark["poet/env::make-tag"][":name"] = "make-tag";
-  newark["poet/env::make-env"] = (function (a_1_0, a_1_1) {
-    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
-    label_1_0:{
-      x_1_2 = a_1_1;
+      x_1_1 = newark["poet/env::lookup"](a_1_0, a_1_1);
+      x_1_2 = x_1_1;
       if (!(x_1_2 == null || x_1_2 === false)) {
-        x_1_1 = x_1_2;
+        x_1_0 = x_1_1[x_0_1];
       } else {
-        x_1_4 = {};
-        x_1_3 = x_1_4;
-        x_1_1 = newark["prelude::list"](x_1_3);
+        x_1_0 = x_1_2;
       };
-      x_1_0 = new newark["poet/env::Env"](a_1_0, x_1_1);
     };
     return x_1_0;
   });
-  newark["poet/env::make-env"][":name"] = "make-env";
-  newark["poet/env::get-package"] = (function (a_1_0) {
+  newark["poet/expander::macro?"][":name"] = "macro?";
+  newark["poet/expander::make-symbol-macro"] = (function (a_1_0) {
+    var x_1_0;
+    label_1_0:{
+      a_1_0[x_0_2] = true;
+      x_1_0 = a_1_0;
+    };
+    return x_1_0;
+  });
+  newark["poet/expander::make-symbol-macro"][":name"] = "make-symbol-macro";
+  newark["poet/expander::symbol-macro?"] = (function (a_1_0, a_1_1) {
     var x_1_0, x_1_1, x_1_2;
     label_1_0:{
-      x_1_1 = newark["poet/env::to-name"](a_1_0);
-      x_1_2 = newark["poet/env::packages"][x_1_1];
-      if (!(x_1_2 == null || x_1_2 === false)) {;} else {
-        newark["poet/env::packages"][x_1_1] = newark["poet/env::make-env"](x_1_1);
-      };
-      x_1_0 = newark["poet/env::packages"][x_1_1];
-    };
-    return x_1_0;
-  });
-  newark["poet/env::get-package"][":name"] = "get-package";
-  newark["poet/env::extend"] = (function (a_1_0) {
-    var x_1_0, x_1_1, x_1_2, x_1_3;
-    label_1_0:{
-      x_1_3 = {};
-      x_1_2 = x_1_3;
-      x_1_1 = newark["prelude::cons"](x_1_2, a_1_0["bindings"]);
-      x_1_0 = new newark["poet/env::Env"](a_1_0["package"], x_1_1);
-    };
-    return x_1_0;
-  });
-  newark["poet/env::extend"][":name"] = "extend";
-  newark["poet/env::lookup*"] = (function (a_1_0, a_1_1, a_1_2) {
-    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
-    label_1_0:{
-      x_1_1 = a_1_0["bindings"];
-      label_1_1:for(;;) {
-        x_1_2 = (x_1_1["size"] === 0);
-        if (!(x_1_2 == null || x_1_2 === false)) {
-          x_1_0 = null;
-          break label_1_1;
-        };
-        x_1_3 = x_1_1["head"];
-        x_1_4 = (newark["poet/env::k"] in x_1_3);
-        if (!(x_1_4 == null || x_1_4 === false)) {
-          x_1_0 = x_1_3[newark["poet/env::k"]];
-          break label_1_1;
-        };
-        x_1_1 = x_1_1["tail"];
-      };
-    };
-    return x_1_0;
-  });
-  newark["poet/env::lookup*"][":name"] = "lookup*";
-  newark["poet/env::lookup"] = (function (a_1_0, a_1_1, a_1_2) {
-    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4, x_1_5, x_1_6, x_1_7;
-    label_1_0:{
-      x_1_2 = newark["prelude::qualified-symbol?"](a_1_1);
+      x_1_1 = newark["poet/env::lookup"](a_1_0, a_1_1);
+      x_1_2 = x_1_1;
       if (!(x_1_2 == null || x_1_2 === false)) {
-        x_1_3 = newark["poet/env::get-package"](a_1_1["qualifier"]);
-        x_1_4 = newark["poet/env::to-key"](a_1_1);
-        x_1_1 = newark["poet/env::lookup*"](x_1_3, x_1_4, a_1_2);
+        x_1_0 = x_1_1[x_0_2];
       } else {
-        x_1_1 = null;
-      };
-      if (!(x_1_1 == null || x_1_1 === false)) {
-        x_1_0 = x_1_1;
-      } else {
-        x_1_6 = newark["poet/env::to-key"](a_1_1);
-        x_1_5 = newark["poet/env::lookup*"](a_1_0, x_1_6);
-        if (!(x_1_5 == null || x_1_5 === false)) {
-          x_1_0 = x_1_5;
-        } else {
-          x_1_7 = newark["prelude::tagged-symbol?"](a_1_1);
-          if (!(x_1_7 == null || x_1_7 === false)) {
-            x_1_0 = newark["poet/env::lookup"](a_1_1["tag"]["env"], a_1_1["child"], a_1_2);
-          } else {
-            x_1_0 = null;
-          };
-        };
+        x_1_0 = x_1_2;
       };
     };
     return x_1_0;
   });
-  newark["poet/env::lookup"][":name"] = "lookup";
-  newark["poet/env::intern"] = (function (a_1_0, a_1_1, a_1_2) {
+  newark["poet/expander::symbol-macro?"][":name"] = "symbol-macro?";
+  newark["poet/expander::make-special-form"] = (function (a_1_0) {
+    var x_1_0;
+    label_1_0:{
+      a_1_0[x_0_3] = true;
+      x_1_0 = a_1_0;
+    };
+    return x_1_0;
+  });
+  newark["poet/expander::make-special-form"][":name"] = "make-special-form";
+  newark["poet/expander::special-form?"] = (function (a_1_0, a_1_1) {
     var x_1_0, x_1_1, x_1_2;
     label_1_0:{
-      x_1_1 = newark["prelude::first"](a_1_0["bindings"]);
-      x_1_2 = newark["poet/env::to-key"](a_1_1);
-      x_1_1[x_1_2] = a_1_2;
-    };
-    return x_1_0;
-  });
-  newark["poet/env::intern"][":name"] = "intern";
-  x_0_4 = newark["prelude::next-generic-id"]();
-  x_0_2 = (x_0_4 + ":" + "to-key");
-  x_0_3 = (function (a_1_0) {
-    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
-    label_1_0:{
-      x_1_3 = (a_1_0 == null);
-      if (!(x_1_3 == null || x_1_3 === false)) {
-        x_1_1 = newark["prelude::nil-vtable"];
-      } else {
-        x_1_1 = a_1_0;
-      };
-      x_1_4 = x_1_1[x_0_2];
-      if (!(x_1_4 == null || x_1_4 === false)) {
-        x_1_2 = x_1_4;
-      } else {
-        x_1_2 = x_0_3[":default"];
-      };
-      x_1_0 = x_1_2(a_1_0);
-    };
-    return x_1_0;
-  });
-  x_0_3[":name"] = "to-key";
-  x_0_3[":generic-id"] = x_0_2;
-  newark["poet/env::to-key"] = x_0_3;
-  x_0_5 = (function (a_1_0) {
-    var x_1_0;
-    x_1_0 = ("STRING(" + a_1_0 + ")");
-    return x_1_0;
-  });
-  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["String"], x_0_5);
-  x_0_6 = (function (a_1_0) {
-    var x_1_0, x_1_1, x_1_2;
-    x_1_2 = newark["prelude::map"](newark["poet/env::to-key"], a_1_0);
-    x_1_1 = x_1_2["join"](" ");
-    x_1_0 = ("[" + x_1_1 + "]");
-    return x_1_0;
-  });
-  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["Array"], x_0_6);
-  x_0_7 = (function (a_1_0) {
-    var x_1_0;
-    x_1_0 = ("KEYWORD(" + a_1_0["name"] + ")");
-    return x_1_0;
-  });
-  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["prelude::Keyword"], x_0_7);
-  x_0_8 = (function (a_1_0) {
-    var x_1_0, x_1_1, x_1_2, x_1_3;
-    x_1_1 = a_1_0["key"];
-    if (!(x_1_1 == null || x_1_1 === false)) {;} else {
-      x_1_2 = newark["prelude::tagged-symbol?"](a_1_0);
+      x_1_1 = newark["poet/env::lookup"](a_1_0, a_1_1);
+      x_1_2 = x_1_1;
       if (!(x_1_2 == null || x_1_2 === false)) {
-        x_1_3 = newark["poet/env::to-key"](a_1_0["child"]);
-        a_1_0["key"] = ("TAG(" + a_1_0["id"] + newark["prelude::+"] + ")" + x_1_3);
+        x_1_0 = x_1_1[x_0_3];
       } else {
-        a_1_0["key"] = ("SYMBOL(" + a_1_0["name"] + ")");
+        x_1_0 = x_1_2;
       };
     };
-    x_1_0 = a_1_0["key"];
     return x_1_0;
   });
-  newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["prelude::Symbol"], x_0_8);
-  x_0_11 = newark["prelude::next-generic-id"]();
-  x_0_9 = (x_0_11 + ":" + "to-name");
-  x_0_10 = (function (a_1_0) {
-    var x_1_0, x_1_1, x_1_2, x_1_3, x_1_4;
-    label_1_0:{
-      x_1_3 = (a_1_0 == null);
-      if (!(x_1_3 == null || x_1_3 === false)) {
-        x_1_1 = newark["prelude::nil-vtable"];
-      } else {
-        x_1_1 = a_1_0;
-      };
-      x_1_4 = x_1_1[x_0_9];
-      if (!(x_1_4 == null || x_1_4 === false)) {
-        x_1_2 = x_1_4;
-      } else {
-        x_1_2 = x_0_10[":default"];
-      };
-      x_1_0 = x_1_2(a_1_0);
-    };
-    return x_1_0;
-  });
-  x_0_10[":name"] = "to-name";
-  x_0_10[":generic-id"] = x_0_9;
-  newark["poet/env::to-name"] = x_0_10;
-  x_0_12 = (function (a_1_0) {
-    var x_1_0;
-    x_1_0 = a_1_0;
-    return x_1_0;
-  });
-  newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["core::js"]["String"], x_0_12);
-  x_0_13 = (function (a_1_0) {
-    var x_1_0;
-    x_1_0 = a_1_0["name"];
-    return x_1_0;
-  });
-  newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["prelude::Keyword"], x_0_13);
-  x_0_14 = (function (a_1_0) {
-    var x_1_0;
-    x_1_0 = a_1_0["name"];
-    return x_1_0;
-  });
-  x_0_0 = newark["prelude::extend-generic*"](newark["poet/env::to-name"], newark["prelude::Symbol"], x_0_14);
+  newark["poet/expander::special-form?"][":name"] = "special-form?";
+  x_0_0 = null;
   return x_0_0;
 })();
 
 // poet.newark
 
 (function () {
-  var x_0_0, x_0_1, x_0_2, x_0_3, x_0_4, x_0_5, x_0_6, x_0_7, x_0_8, x_0_9, x_0_10, x_0_11, x_0_12, x_0_13, x_0_14, x_0_15, x_0_16, x_0_17, x_0_18, x_0_19, x_0_20, x_0_21, x_0_22, x_0_23, x_0_24, x_0_25, x_0_26, x_0_27, x_0_28, x_0_29, x_0_30, x_0_31, x_0_32, x_0_33, x_0_34, x_0_35, x_0_36, x_0_37, x_0_38, x_0_39, x_0_40, x_0_41, x_0_42, x_0_43, x_0_44, x_0_45, x_0_46, x_0_47, x_0_48, x_0_49, x_0_50, x_0_51, x_0_52, x_0_53, x_0_54, x_0_55, x_0_56, x_0_57, x_0_58, x_0_59, x_0_60, x_0_61, x_0_62, x_0_63, x_0_64, x_0_65, x_0_66, x_0_67, x_0_68, x_0_69, x_0_70, x_0_71, x_0_72, x_0_73, x_0_74, x_0_75, x_0_76, x_0_77, x_0_78, x_0_79, x_0_80, x_0_81, x_0_82, x_0_83, x_0_84, x_0_85, x_0_86, x_0_87, x_0_88, x_0_89, x_0_90, x_0_91, x_0_92, x_0_93, x_0_94, x_0_95, x_0_96, x_0_97, x_0_98, x_0_99, x_0_100, x_0_101, x_0_102, x_0_103, x_0_104, x_0_105, x_0_106, x_0_107, x_0_108, x_0_109, x_0_110, x_0_111, x_0_112, x_0_113;
-  x_0_94 = newark["prelude::make-keyword"]("LABEL");
-  x_0_90 = newark["prelude::make-keyword"]("foo");
-  newark["poet::p"] = (function () {
-    var x_1_0;
-    label_1_0:{
-      x_1_0 = null;
-    };
-    return x_1_0;
-  });
-  newark["poet::p"][":name"] = "p";
-  x_0_2 = newark["poet/reader::Reader"]("42");
-  x_0_1 = newark["poet/reader::read-form"](x_0_2);
-  x_0_4 = newark["prelude::make-symbol"]("read-form");
-  x_0_6 = newark["prelude::make-symbol"]("Reader");
-  x_0_5 = newark["prelude::list"](x_0_6, "42");
-  x_0_3 = newark["prelude::list"](x_0_4, x_0_5);
-  newark["prelude::pr"](x_0_3);
+  var x_0_0, x_0_1, x_0_2, x_0_3, x_0_4, x_0_5, x_0_6, x_0_7, x_0_8, x_0_9, x_0_10, x_0_11, x_0_12, x_0_13, x_0_14, x_0_15, x_0_16, x_0_17, x_0_18, x_0_19, x_0_20, x_0_21, x_0_22, x_0_23, x_0_24, x_0_25, x_0_26, x_0_27, x_0_28, x_0_29, x_0_30, x_0_31, x_0_32, x_0_33, x_0_34, x_0_35, x_0_36, x_0_37, x_0_38, x_0_39, x_0_40, x_0_41, x_0_42, x_0_43, x_0_44, x_0_45, x_0_46, x_0_47, x_0_48, x_0_49, x_0_50, x_0_51, x_0_52, x_0_53, x_0_54, x_0_55, x_0_56, x_0_57, x_0_58, x_0_59, x_0_60, x_0_61, x_0_62, x_0_63, x_0_64, x_0_65, x_0_66, x_0_67, x_0_68, x_0_69, x_0_70, x_0_71, x_0_72, x_0_73, x_0_74, x_0_75, x_0_76, x_0_77, x_0_78, x_0_79, x_0_80, x_0_81, x_0_82, x_0_83, x_0_84, x_0_85, x_0_86, x_0_87, x_0_88, x_0_89, x_0_90, x_0_91, x_0_92, x_0_93, x_0_94, x_0_95, x_0_96, x_0_97, x_0_98, x_0_99, x_0_100, x_0_101, x_0_102, x_0_103, x_0_104, x_0_105, x_0_106, x_0_107, x_0_108, x_0_109, x_0_110, x_0_111, x_0_112, x_0_113, x_0_114, x_0_115, x_0_116, x_0_117, x_0_118, x_0_119, x_0_120, x_0_121, x_0_122, x_0_123, x_0_124, x_0_125, x_0_126, x_0_127, x_0_128, x_0_129, x_0_130, x_0_131, x_0_132, x_0_133, x_0_134, x_0_135, x_0_136, x_0_137, x_0_138, x_0_139, x_0_140, x_0_141, x_0_142, x_0_143, x_0_144, x_0_145, x_0_146, x_0_147, x_0_148, x_0_149, x_0_150, x_0_151, x_0_152, x_0_153, x_0_154, x_0_155, x_0_156, x_0_157, x_0_158, x_0_159, x_0_160, x_0_161, x_0_162, x_0_163, x_0_164, x_0_165, x_0_166, x_0_167, x_0_168, x_0_169, x_0_170, x_0_171, x_0_172, x_0_173, x_0_174, x_0_175, x_0_176, x_0_177, x_0_178, x_0_179, x_0_180, x_0_181, x_0_182, x_0_183, x_0_184, x_0_185, x_0_186, x_0_187, x_0_188, x_0_189, x_0_190, x_0_191, x_0_192, x_0_193, x_0_194, x_0_195, x_0_196, x_0_197, x_0_198, x_0_199, x_0_200, x_0_201, x_0_202, x_0_203, x_0_204, x_0_205, x_0_206, x_0_207, x_0_208, x_0_209, x_0_210;
+  x_0_96 = newark["prelude::make-keyword"]("LABEL");
+  x_0_92 = newark["prelude::make-keyword"]("foo");
+  newark["prelude::println"]();
+  x_0_1 = ("[" + "reader-sanity-check" + "]");
+  newark["prelude::println"](x_0_1);
+  x_0_3 = newark["poet/reader::Reader"]("42");
+  x_0_2 = newark["poet/reader::read-form"](x_0_3);
+  x_0_5 = newark["prelude::make-symbol"]("read-form");
+  x_0_7 = newark["prelude::make-symbol"]("Reader");
+  x_0_6 = newark["prelude::list"](x_0_7, "42");
+  x_0_4 = newark["prelude::list"](x_0_5, x_0_6);
+  newark["prelude::pr"](x_0_4);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_1);
-  x_0_9 = newark["poet/reader::Reader"]("42");
-  x_0_8 = newark["poet/reader::read-form"](x_0_9);
-  x_0_7 = newark["prelude::number?"](x_0_8);
-  x_0_11 = newark["prelude::make-symbol"]("number?");
-  x_0_13 = newark["prelude::make-symbol"]("read-form");
-  x_0_15 = newark["prelude::make-symbol"]("Reader");
-  x_0_14 = newark["prelude::list"](x_0_15, "42");
-  x_0_12 = newark["prelude::list"](x_0_13, x_0_14);
-  x_0_10 = newark["prelude::list"](x_0_11, x_0_12);
-  newark["prelude::pr"](x_0_10);
+  newark["prelude::prn"](x_0_2);
+  x_0_10 = newark["poet/reader::Reader"]("42");
+  x_0_9 = newark["poet/reader::read-form"](x_0_10);
+  x_0_8 = newark["prelude::number?"](x_0_9);
+  x_0_12 = newark["prelude::make-symbol"]("number?");
+  x_0_14 = newark["prelude::make-symbol"]("read-form");
+  x_0_16 = newark["prelude::make-symbol"]("Reader");
+  x_0_15 = newark["prelude::list"](x_0_16, "42");
+  x_0_13 = newark["prelude::list"](x_0_14, x_0_15);
+  x_0_11 = newark["prelude::list"](x_0_12, x_0_13);
+  newark["prelude::pr"](x_0_11);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_7);
-  x_0_17 = newark["poet/reader::Reader"]("foo");
-  x_0_16 = newark["poet/reader::read-form"](x_0_17);
-  x_0_19 = newark["prelude::make-symbol"]("read-form");
-  x_0_21 = newark["prelude::make-symbol"]("Reader");
-  x_0_20 = newark["prelude::list"](x_0_21, "foo");
-  x_0_18 = newark["prelude::list"](x_0_19, x_0_20);
-  newark["prelude::pr"](x_0_18);
+  newark["prelude::prn"](x_0_8);
+  x_0_18 = newark["poet/reader::Reader"]("foo");
+  x_0_17 = newark["poet/reader::read-form"](x_0_18);
+  x_0_20 = newark["prelude::make-symbol"]("read-form");
+  x_0_22 = newark["prelude::make-symbol"]("Reader");
+  x_0_21 = newark["prelude::list"](x_0_22, "foo");
+  x_0_19 = newark["prelude::list"](x_0_20, x_0_21);
+  newark["prelude::pr"](x_0_19);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_16);
-  x_0_24 = newark["poet/reader::Reader"]("foo");
-  x_0_23 = newark["poet/reader::read-form"](x_0_24);
-  x_0_22 = newark["prelude::symbol?"](x_0_23);
-  x_0_26 = newark["prelude::make-symbol"]("symbol?");
-  x_0_28 = newark["prelude::make-symbol"]("read-form");
-  x_0_30 = newark["prelude::make-symbol"]("Reader");
-  x_0_29 = newark["prelude::list"](x_0_30, "foo");
-  x_0_27 = newark["prelude::list"](x_0_28, x_0_29);
-  x_0_25 = newark["prelude::list"](x_0_26, x_0_27);
-  newark["prelude::pr"](x_0_25);
+  newark["prelude::prn"](x_0_17);
+  x_0_25 = newark["poet/reader::Reader"]("foo");
+  x_0_24 = newark["poet/reader::read-form"](x_0_25);
+  x_0_23 = newark["prelude::symbol?"](x_0_24);
+  x_0_27 = newark["prelude::make-symbol"]("symbol?");
+  x_0_29 = newark["prelude::make-symbol"]("read-form");
+  x_0_31 = newark["prelude::make-symbol"]("Reader");
+  x_0_30 = newark["prelude::list"](x_0_31, "foo");
+  x_0_28 = newark["prelude::list"](x_0_29, x_0_30);
+  x_0_26 = newark["prelude::list"](x_0_27, x_0_28);
+  newark["prelude::pr"](x_0_26);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_22);
-  x_0_32 = newark["poet/reader::Reader"](":foo");
-  x_0_31 = newark["poet/reader::read-form"](x_0_32);
-  x_0_34 = newark["prelude::make-symbol"]("read-form");
-  x_0_36 = newark["prelude::make-symbol"]("Reader");
-  x_0_35 = newark["prelude::list"](x_0_36, ":foo");
-  x_0_33 = newark["prelude::list"](x_0_34, x_0_35);
-  newark["prelude::pr"](x_0_33);
+  newark["prelude::prn"](x_0_23);
+  x_0_33 = newark["poet/reader::Reader"](":foo");
+  x_0_32 = newark["poet/reader::read-form"](x_0_33);
+  x_0_35 = newark["prelude::make-symbol"]("read-form");
+  x_0_37 = newark["prelude::make-symbol"]("Reader");
+  x_0_36 = newark["prelude::list"](x_0_37, ":foo");
+  x_0_34 = newark["prelude::list"](x_0_35, x_0_36);
+  newark["prelude::pr"](x_0_34);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_31);
-  x_0_39 = newark["poet/reader::Reader"](":foo");
-  x_0_38 = newark["poet/reader::read-form"](x_0_39);
-  x_0_37 = newark["prelude::keyword?"](x_0_38);
-  x_0_41 = newark["prelude::make-symbol"]("keyword?");
-  x_0_43 = newark["prelude::make-symbol"]("read-form");
-  x_0_45 = newark["prelude::make-symbol"]("Reader");
-  x_0_44 = newark["prelude::list"](x_0_45, ":foo");
-  x_0_42 = newark["prelude::list"](x_0_43, x_0_44);
-  x_0_40 = newark["prelude::list"](x_0_41, x_0_42);
-  newark["prelude::pr"](x_0_40);
+  newark["prelude::prn"](x_0_32);
+  x_0_40 = newark["poet/reader::Reader"](":foo");
+  x_0_39 = newark["poet/reader::read-form"](x_0_40);
+  x_0_38 = newark["prelude::keyword?"](x_0_39);
+  x_0_42 = newark["prelude::make-symbol"]("keyword?");
+  x_0_44 = newark["prelude::make-symbol"]("read-form");
+  x_0_46 = newark["prelude::make-symbol"]("Reader");
+  x_0_45 = newark["prelude::list"](x_0_46, ":foo");
+  x_0_43 = newark["prelude::list"](x_0_44, x_0_45);
+  x_0_41 = newark["prelude::list"](x_0_42, x_0_43);
+  newark["prelude::pr"](x_0_41);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_37);
-  x_0_47 = newark["poet/reader::Reader"]("foo::bar");
-  x_0_46 = newark["poet/reader::read-form"](x_0_47);
-  x_0_49 = newark["prelude::make-symbol"]("read-form");
-  x_0_51 = newark["prelude::make-symbol"]("Reader");
-  x_0_50 = newark["prelude::list"](x_0_51, "foo::bar");
-  x_0_48 = newark["prelude::list"](x_0_49, x_0_50);
-  newark["prelude::pr"](x_0_48);
+  newark["prelude::prn"](x_0_38);
+  x_0_48 = newark["poet/reader::Reader"]("foo::bar");
+  x_0_47 = newark["poet/reader::read-form"](x_0_48);
+  x_0_50 = newark["prelude::make-symbol"]("read-form");
+  x_0_52 = newark["prelude::make-symbol"]("Reader");
+  x_0_51 = newark["prelude::list"](x_0_52, "foo::bar");
+  x_0_49 = newark["prelude::list"](x_0_50, x_0_51);
+  newark["prelude::pr"](x_0_49);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_46);
-  x_0_54 = newark["poet/reader::Reader"]("foo::bar");
-  x_0_53 = newark["poet/reader::read-form"](x_0_54);
-  x_0_52 = newark["prelude::qualified-symbol?"](x_0_53);
-  x_0_56 = newark["prelude::make-symbol"]("qualified-symbol?");
-  x_0_58 = newark["prelude::make-symbol"]("read-form");
-  x_0_60 = newark["prelude::make-symbol"]("Reader");
-  x_0_59 = newark["prelude::list"](x_0_60, "foo::bar");
-  x_0_57 = newark["prelude::list"](x_0_58, x_0_59);
-  x_0_55 = newark["prelude::list"](x_0_56, x_0_57);
-  newark["prelude::pr"](x_0_55);
+  newark["prelude::prn"](x_0_47);
+  x_0_55 = newark["poet/reader::Reader"]("foo::bar");
+  x_0_54 = newark["poet/reader::read-form"](x_0_55);
+  x_0_53 = newark["prelude::qualified-symbol?"](x_0_54);
+  x_0_57 = newark["prelude::make-symbol"]("qualified-symbol?");
+  x_0_59 = newark["prelude::make-symbol"]("read-form");
+  x_0_61 = newark["prelude::make-symbol"]("Reader");
+  x_0_60 = newark["prelude::list"](x_0_61, "foo::bar");
+  x_0_58 = newark["prelude::list"](x_0_59, x_0_60);
+  x_0_56 = newark["prelude::list"](x_0_57, x_0_58);
+  newark["prelude::pr"](x_0_56);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_52);
-  x_0_61 = newark["poet/reader::terminal?"](")");
-  x_0_63 = newark["prelude::make-symbol"]("terminal?");
-  x_0_62 = newark["prelude::list"](x_0_63, ")");
-  newark["prelude::pr"](x_0_62);
+  newark["prelude::prn"](x_0_53);
+  x_0_62 = newark["poet/reader::terminal?"](")");
+  x_0_64 = newark["prelude::make-symbol"]("terminal?");
+  x_0_63 = newark["prelude::list"](x_0_64, ")");
+  newark["prelude::pr"](x_0_63);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_61);
-  x_0_64 = newark["poet/reader::not-constituent?"](")");
-  x_0_66 = newark["prelude::make-symbol"]("not-constituent?");
-  x_0_65 = newark["prelude::list"](x_0_66, ")");
-  newark["prelude::pr"](x_0_65);
+  newark["prelude::prn"](x_0_62);
+  x_0_65 = newark["poet/reader::not-constituent?"](")");
+  x_0_67 = newark["prelude::make-symbol"]("not-constituent?");
+  x_0_66 = newark["prelude::list"](x_0_67, ")");
+  newark["prelude::pr"](x_0_66);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_64);
-  x_0_68 = newark["poet/reader::Reader"]("(1 2 3 4 5 6)");
-  x_0_67 = newark["poet/reader::read-form"](x_0_68);
-  x_0_70 = newark["prelude::make-symbol"]("read-form");
-  x_0_72 = newark["prelude::make-symbol"]("Reader");
-  x_0_71 = newark["prelude::list"](x_0_72, "(1 2 3 4 5 6)");
-  x_0_69 = newark["prelude::list"](x_0_70, x_0_71);
-  newark["prelude::pr"](x_0_69);
+  newark["prelude::prn"](x_0_65);
+  x_0_69 = newark["poet/reader::Reader"]("(1 2 3 4 5 6)");
+  x_0_68 = newark["poet/reader::read-form"](x_0_69);
+  x_0_71 = newark["prelude::make-symbol"]("read-form");
+  x_0_73 = newark["prelude::make-symbol"]("Reader");
+  x_0_72 = newark["prelude::list"](x_0_73, "(1 2 3 4 5 6)");
+  x_0_70 = newark["prelude::list"](x_0_71, x_0_72);
+  newark["prelude::pr"](x_0_70);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_67);
-  x_0_74 = newark["poet/reader::Reader"]("[ a b (1 :foo 2 :bar 3 [4 5] 6) ]");
-  x_0_73 = newark["poet/reader::read-form"](x_0_74);
-  x_0_76 = newark["prelude::make-symbol"]("read-form");
-  x_0_78 = newark["prelude::make-symbol"]("Reader");
-  x_0_77 = newark["prelude::list"](x_0_78, "[ a b (1 :foo 2 :bar 3 [4 5] 6) ]");
-  x_0_75 = newark["prelude::list"](x_0_76, x_0_77);
-  newark["prelude::pr"](x_0_75);
+  newark["prelude::prn"](x_0_68);
+  x_0_75 = newark["poet/reader::Reader"]("[ a b (1 :foo 2 :bar 3 [4 5] 6) ]");
+  x_0_74 = newark["poet/reader::read-form"](x_0_75);
+  x_0_77 = newark["prelude::make-symbol"]("read-form");
+  x_0_79 = newark["prelude::make-symbol"]("Reader");
+  x_0_78 = newark["prelude::list"](x_0_79, "[ a b (1 :foo 2 :bar 3 [4 5] 6) ]");
+  x_0_76 = newark["prelude::list"](x_0_77, x_0_78);
+  newark["prelude::pr"](x_0_76);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_73);
-  x_0_79 = newark["poet/env::to-key"]("foo");
-  x_0_81 = newark["prelude::make-symbol"]("to-key");
-  x_0_80 = newark["prelude::list"](x_0_81, "foo");
-  newark["prelude::pr"](x_0_80);
+  newark["prelude::prn"](x_0_74);
+  newark["prelude::println"]();
+  x_0_80 = ("[" + "to-key-sanity-check" + "]");
+  newark["prelude::println"](x_0_80);
+  x_0_81 = newark["poet/env::to-key"]("foo");
+  x_0_83 = newark["prelude::make-symbol"]("to-key");
+  x_0_82 = newark["prelude::list"](x_0_83, "foo");
+  newark["prelude::pr"](x_0_82);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_79);
-  x_0_83 = newark["prelude::make-symbol"]("foo");
-  x_0_82 = newark["poet/env::to-key"](x_0_83);
-  x_0_85 = newark["prelude::make-symbol"]("to-key");
-  x_0_87 = newark["prelude::make-qualified-symbol"]("core", "quote");
-  x_0_88 = newark["prelude::make-symbol"]("foo");
+  newark["prelude::prn"](x_0_81);
+  x_0_85 = newark["prelude::make-symbol"]("foo");
+  x_0_84 = newark["poet/env::to-key"](x_0_85);
+  x_0_87 = newark["prelude::make-symbol"]("to-key");
+  x_0_89 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_90 = newark["prelude::make-symbol"]("foo");
+  x_0_88 = newark["prelude::list"](x_0_89, x_0_90);
   x_0_86 = newark["prelude::list"](x_0_87, x_0_88);
-  x_0_84 = newark["prelude::list"](x_0_85, x_0_86);
-  newark["prelude::pr"](x_0_84);
+  newark["prelude::pr"](x_0_86);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_82);
-  x_0_89 = newark["poet/env::to-key"](x_0_90);
-  x_0_92 = newark["prelude::make-symbol"]("to-key");
-  x_0_91 = newark["prelude::list"](x_0_92, x_0_90);
-  newark["prelude::pr"](x_0_91);
+  newark["prelude::prn"](x_0_84);
+  x_0_91 = newark["poet/env::to-key"](x_0_92);
+  x_0_94 = newark["prelude::make-symbol"]("to-key");
+  x_0_93 = newark["prelude::list"](x_0_94, x_0_92);
+  newark["prelude::pr"](x_0_93);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_89);
-  x_0_95 = newark["prelude::make-symbol"]("foo");
-  x_0_93 = newark["poet/env::to-key"]([x_0_94, x_0_95]);
-  x_0_97 = newark["prelude::make-symbol"]("to-key");
-  x_0_99 = newark["prelude::make-qualified-symbol"]("core", "quote");
-  x_0_100 = newark["prelude::make-symbol"]("foo");
-  x_0_98 = newark["prelude::list"](x_0_99, x_0_100);
-  x_0_96 = newark["prelude::list"](x_0_97, [x_0_94, x_0_98]);
-  newark["prelude::pr"](x_0_96);
-  newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_93);
+  newark["prelude::prn"](x_0_91);
+  x_0_97 = newark["prelude::make-symbol"]("foo");
+  x_0_95 = newark["poet/env::to-key"]([x_0_96, x_0_97]);
+  x_0_99 = newark["prelude::make-symbol"]("to-key");
+  x_0_101 = newark["prelude::make-qualified-symbol"]("core", "quote");
   x_0_102 = newark["prelude::make-symbol"]("foo");
-  x_0_101 = newark["poet/env::to-name"](x_0_102);
-  x_0_104 = newark["prelude::make-symbol"]("to-name");
-  x_0_106 = newark["prelude::make-qualified-symbol"]("core", "quote");
-  x_0_107 = newark["prelude::make-symbol"]("foo");
-  x_0_105 = newark["prelude::list"](x_0_106, x_0_107);
-  x_0_103 = newark["prelude::list"](x_0_104, x_0_105);
-  newark["prelude::pr"](x_0_103);
+  x_0_100 = newark["prelude::list"](x_0_101, x_0_102);
+  x_0_98 = newark["prelude::list"](x_0_99, [x_0_96, x_0_100]);
+  newark["prelude::pr"](x_0_98);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_101);
-  x_0_108 = newark["poet/env::to-name"](x_0_90);
-  x_0_110 = newark["prelude::make-symbol"]("to-name");
-  x_0_109 = newark["prelude::list"](x_0_110, x_0_90);
-  newark["prelude::pr"](x_0_109);
+  newark["prelude::prn"](x_0_95);
+  newark["prelude::println"]();
+  x_0_103 = ("[" + "to-name-sanity-check" + "]");
+  newark["prelude::println"](x_0_103);
+  x_0_105 = newark["prelude::make-symbol"]("foo");
+  x_0_104 = newark["poet/env::to-name"](x_0_105);
+  x_0_107 = newark["prelude::make-symbol"]("to-name");
+  x_0_109 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_110 = newark["prelude::make-symbol"]("foo");
+  x_0_108 = newark["prelude::list"](x_0_109, x_0_110);
+  x_0_106 = newark["prelude::list"](x_0_107, x_0_108);
+  newark["prelude::pr"](x_0_106);
   newark["prelude::print"](" => ");
-  newark["prelude::prn"](x_0_108);
-  x_0_111 = newark["poet/env::to-name"]("foo");
+  newark["prelude::prn"](x_0_104);
+  x_0_111 = newark["poet/env::to-name"](x_0_92);
   x_0_113 = newark["prelude::make-symbol"]("to-name");
-  x_0_112 = newark["prelude::list"](x_0_113, "foo");
+  x_0_112 = newark["prelude::list"](x_0_113, x_0_92);
   newark["prelude::pr"](x_0_112);
   newark["prelude::print"](" => ");
   newark["prelude::prn"](x_0_111);
+  x_0_114 = newark["poet/env::to-name"]("foo");
+  x_0_116 = newark["prelude::make-symbol"]("to-name");
+  x_0_115 = newark["prelude::list"](x_0_116, "foo");
+  newark["prelude::pr"](x_0_115);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_114);
   newark["poet::e0"] = newark["poet/env::get-package"]("test");
   newark["poet::e1"] = newark["poet/env::extend"](newark["poet::e0"]);
-  newark["prelude::prn"](newark["poet/env::packages"]);
-  newark["prelude::prn"](newark["poet::e0"]);
-  x_0_0 = newark["prelude::prn"](newark["poet::e1"]);
+  newark["poet::tag0"] = newark["poet/env::make-tag"](newark["poet::e0"]);
+  x_0_117 = newark["prelude::make-symbol"]("foo");
+  newark["poet::tagged-foo"] = newark["prelude::make-tagged-symbol"](x_0_117, newark["poet::tag0"]);
+  newark["prelude::println"]();
+  x_0_118 = ("[" + "env-sanity-check" + "]");
+  newark["prelude::println"](x_0_118);
+  x_0_119 = newark["poet/env::to-key"](newark["poet::tagged-foo"]);
+  x_0_121 = newark["prelude::make-symbol"]("to-key");
+  x_0_122 = newark["prelude::make-symbol"]("tagged-foo");
+  x_0_120 = newark["prelude::list"](x_0_121, x_0_122);
+  newark["prelude::pr"](x_0_120);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_119);
+  x_0_124 = newark["prelude::make-symbol"]("foo");
+  x_0_123 = newark["poet/env::intern"](newark["poet::e0"], x_0_124, "bar");
+  x_0_126 = newark["prelude::make-symbol"]("intern");
+  x_0_127 = newark["prelude::make-symbol"]("e0");
+  x_0_129 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_130 = newark["prelude::make-symbol"]("foo");
+  x_0_128 = newark["prelude::list"](x_0_129, x_0_130);
+  x_0_125 = newark["prelude::list"](x_0_126, x_0_127, x_0_128, "bar");
+  newark["prelude::pr"](x_0_125);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_123);
+  x_0_132 = newark["prelude::make-symbol"]("foo");
+  x_0_131 = newark["poet/env::lookup"](newark["poet::e0"], x_0_132);
+  x_0_134 = newark["prelude::make-symbol"]("lookup");
+  x_0_135 = newark["prelude::make-symbol"]("e0");
+  x_0_137 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_138 = newark["prelude::make-symbol"]("foo");
+  x_0_136 = newark["prelude::list"](x_0_137, x_0_138);
+  x_0_133 = newark["prelude::list"](x_0_134, x_0_135, x_0_136);
+  newark["prelude::pr"](x_0_133);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_131);
+  x_0_140 = newark["prelude::make-symbol"]("foo");
+  x_0_139 = newark["poet/env::lookup"](newark["poet::e1"], x_0_140);
+  x_0_142 = newark["prelude::make-symbol"]("lookup");
+  x_0_143 = newark["prelude::make-symbol"]("e1");
+  x_0_145 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_146 = newark["prelude::make-symbol"]("foo");
+  x_0_144 = newark["prelude::list"](x_0_145, x_0_146);
+  x_0_141 = newark["prelude::list"](x_0_142, x_0_143, x_0_144);
+  newark["prelude::pr"](x_0_141);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_139);
+  x_0_148 = newark["prelude::make-symbol"]("foo");
+  x_0_147 = newark["poet/env::intern"](newark["poet::e1"], x_0_148, "baz");
+  x_0_150 = newark["prelude::make-symbol"]("intern");
+  x_0_151 = newark["prelude::make-symbol"]("e1");
+  x_0_153 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_154 = newark["prelude::make-symbol"]("foo");
+  x_0_152 = newark["prelude::list"](x_0_153, x_0_154);
+  x_0_149 = newark["prelude::list"](x_0_150, x_0_151, x_0_152, "baz");
+  newark["prelude::pr"](x_0_149);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_147);
+  x_0_156 = newark["prelude::make-symbol"]("foo");
+  x_0_155 = newark["poet/env::lookup"](newark["poet::e0"], x_0_156);
+  x_0_158 = newark["prelude::make-symbol"]("lookup");
+  x_0_159 = newark["prelude::make-symbol"]("e0");
+  x_0_161 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_162 = newark["prelude::make-symbol"]("foo");
+  x_0_160 = newark["prelude::list"](x_0_161, x_0_162);
+  x_0_157 = newark["prelude::list"](x_0_158, x_0_159, x_0_160);
+  newark["prelude::pr"](x_0_157);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_155);
+  x_0_164 = newark["prelude::make-symbol"]("foo");
+  x_0_163 = newark["poet/env::lookup"](newark["poet::e1"], x_0_164);
+  x_0_166 = newark["prelude::make-symbol"]("lookup");
+  x_0_167 = newark["prelude::make-symbol"]("e1");
+  x_0_169 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_170 = newark["prelude::make-symbol"]("foo");
+  x_0_168 = newark["prelude::list"](x_0_169, x_0_170);
+  x_0_165 = newark["prelude::list"](x_0_166, x_0_167, x_0_168);
+  newark["prelude::pr"](x_0_165);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_163);
+  x_0_171 = newark["poet/env::lookup"](newark["poet::e0"], newark["poet::tagged-foo"]);
+  x_0_173 = newark["prelude::make-symbol"]("lookup");
+  x_0_174 = newark["prelude::make-symbol"]("e0");
+  x_0_175 = newark["prelude::make-symbol"]("tagged-foo");
+  x_0_172 = newark["prelude::list"](x_0_173, x_0_174, x_0_175);
+  newark["prelude::pr"](x_0_172);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_171);
+  x_0_176 = newark["poet/env::lookup"](newark["poet::e1"], newark["poet::tagged-foo"]);
+  x_0_178 = newark["prelude::make-symbol"]("lookup");
+  x_0_179 = newark["prelude::make-symbol"]("e1");
+  x_0_180 = newark["prelude::make-symbol"]("tagged-foo");
+  x_0_177 = newark["prelude::list"](x_0_178, x_0_179, x_0_180);
+  newark["prelude::pr"](x_0_177);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_176);
+  x_0_181 = newark["poet/env::intern"](newark["poet::e0"], newark["poet::tagged-foo"], "zonk");
+  x_0_183 = newark["prelude::make-symbol"]("intern");
+  x_0_184 = newark["prelude::make-symbol"]("e0");
+  x_0_185 = newark["prelude::make-symbol"]("tagged-foo");
+  x_0_182 = newark["prelude::list"](x_0_183, x_0_184, x_0_185, "zonk");
+  newark["prelude::pr"](x_0_182);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_181);
+  x_0_186 = newark["poet/env::lookup"](newark["poet::e1"], newark["poet::tagged-foo"]);
+  x_0_188 = newark["prelude::make-symbol"]("lookup");
+  x_0_189 = newark["prelude::make-symbol"]("e1");
+  x_0_190 = newark["prelude::make-symbol"]("tagged-foo");
+  x_0_187 = newark["prelude::list"](x_0_188, x_0_189, x_0_190);
+  newark["prelude::pr"](x_0_187);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_186);
+  x_0_192 = newark["prelude::make-symbol"]("foo");
+  x_0_193 = newark["prelude::make-symbol"]("foo");
+  x_0_191 = newark["poet/env::intern"](newark["poet::e0"], [x_0_96, x_0_192], x_0_193);
+  x_0_195 = newark["prelude::make-symbol"]("intern");
+  x_0_196 = newark["prelude::make-symbol"]("e0");
+  x_0_198 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_199 = newark["prelude::make-symbol"]("foo");
+  x_0_197 = newark["prelude::list"](x_0_198, x_0_199);
+  x_0_201 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_202 = newark["prelude::make-symbol"]("foo");
+  x_0_200 = newark["prelude::list"](x_0_201, x_0_202);
+  x_0_194 = newark["prelude::list"](x_0_195, x_0_196, [x_0_96, x_0_197], x_0_200);
+  newark["prelude::pr"](x_0_194);
+  newark["prelude::print"](" => ");
+  newark["prelude::prn"](x_0_191);
+  x_0_204 = newark["prelude::make-symbol"]("foo");
+  x_0_203 = newark["poet/env::lookup"](newark["poet::e0"], [x_0_96, x_0_204]);
+  x_0_206 = newark["prelude::make-symbol"]("lookup");
+  x_0_207 = newark["prelude::make-symbol"]("e0");
+  x_0_209 = newark["prelude::make-qualified-symbol"]("core", "quote");
+  x_0_210 = newark["prelude::make-symbol"]("foo");
+  x_0_208 = newark["prelude::list"](x_0_209, x_0_210);
+  x_0_205 = newark["prelude::list"](x_0_206, x_0_207, [x_0_96, x_0_208]);
+  newark["prelude::pr"](x_0_205);
+  newark["prelude::print"](" => ");
+  x_0_0 = newark["prelude::prn"](x_0_203);
   return x_0_0;
 })();
 
