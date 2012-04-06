@@ -33,3 +33,9 @@
 (spy (to-name :foo))
 (spy (to-name "foo"))
 
+(define e0 (get-package "test"))
+(define e1 (extend e0))
+
+(prn packages)
+(prn e0)
+(prn e1)

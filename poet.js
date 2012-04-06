@@ -2415,9 +2415,10 @@ if (typeof require != 'undefined') {
   });
   newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["String"], x_0_5);
   x_0_6 = (function (a_1_0) {
-    var x_1_0, x_1_1;
-    x_1_1 = newark["prelude::map"](newark["poet/env::to-key"], a_1_0);
-    x_1_0 = newark["prelude::print-str"](x_1_1);
+    var x_1_0, x_1_1, x_1_2;
+    x_1_2 = newark["prelude::map"](newark["poet/env::to-key"], a_1_0);
+    x_1_1 = x_1_2["join"](" ");
+    x_1_0 = ("[" + x_1_1 + "]");
     return x_1_0;
   });
   newark["prelude::extend-generic*"](newark["poet/env::to-key"], newark["core::js"]["Array"], x_0_6);
@@ -2669,7 +2670,12 @@ if (typeof require != 'undefined') {
   x_0_112 = newark["prelude::list"](x_0_113, "foo");
   newark["prelude::pr"](x_0_112);
   newark["prelude::print"](" => ");
-  x_0_0 = newark["prelude::prn"](x_0_111);
+  newark["prelude::prn"](x_0_111);
+  newark["poet::e0"] = newark["poet/env::get-package"]("test");
+  newark["poet::e1"] = newark["poet/env::extend"](newark["poet::e0"]);
+  newark["prelude::prn"](newark["poet/env::packages"]);
+  newark["prelude::prn"](newark["poet::e0"]);
+  x_0_0 = newark["prelude::prn"](newark["poet::e1"]);
   return x_0_0;
 })();
 
