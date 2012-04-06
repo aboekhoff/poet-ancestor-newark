@@ -2,12 +2,13 @@
 (import dom)
 (import model :prefix db:)
 
+(define num-balls 200)
 (define max-radius 30)
 (define min-radius 10)
 (define max-mass 10)
 (define min-mass 1)
-(define max-speed 5)
-(define min-speed -5)
+(define max-speed 10)
+(define min-speed -10)
 
 (define canvas #nil)
 
@@ -65,7 +66,7 @@
   (set! canvas (html [:canvas#fun-with-balls]))
   (js.document.body.appendChild canvas)
   (resize!)
-  (make-balls 2000))
+  (make-balls num-balls))
 
 (define (draw-ball ball)
   (let* ((ctx (get-context))

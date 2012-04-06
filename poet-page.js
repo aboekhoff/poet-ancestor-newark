@@ -2063,12 +2063,13 @@ if (typeof require != 'undefined') {
   x_0_3 = newark["prelude::make-keyword"]("mass");
   x_0_1 = newark["prelude::make-keyword"]("ball");
   x_0_6 = newark["prelude::make-keyword"]("x-pos");
+  newark["poet-page::num-balls"] = 200;
   newark["poet-page::max-radius"] = 30;
   newark["poet-page::min-radius"] = 10;
   newark["poet-page::max-mass"] = 10;
   newark["poet-page::min-mass"] = 1;
-  newark["poet-page::max-speed"] = 5;
-  newark["poet-page::min-speed"] = -5;
+  newark["poet-page::max-speed"] = 10;
+  newark["poet-page::min-speed"] = -10;
   newark["poet-page::canvas"] = null;
   newark["poet-page::-width"] = null;
   newark["poet-page::-height"] = null;
@@ -2204,7 +2205,7 @@ if (typeof require != 'undefined') {
       newark["poet-page::canvas"] = newark["dom::html"]([x_0_10]);
       newark["core::js"]["document"]["body"]["appendChild"](newark["poet-page::canvas"]);
       newark["poet-page::resize!"]();
-      x_1_0 = newark["poet-page::make-balls"](2000);
+      x_1_0 = newark["poet-page::make-balls"](newark["poet-page::num-balls"]);
     };
     return x_1_0;
   });
