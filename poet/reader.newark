@@ -1,0 +1,259 @@
+(import prelude)
+
+(define reader-macros (object))
+(define dispatch-reader-macros (object))
+
+(define (eof-error! msg)
+  (let ((e (js.Error (or msg "EOF"))))
+    (set! e :recoverable #t)
+    (throw e)))
+
+(define newline-regex
+  (js.RegExp "[\n\f\r]"))
+
+(define whitespace-regex
+  (js.RegExp "\\s"))
+
+(define int-regex
+  (js.RegExp "^(-|\\+)?(0|([1-9][0-9]*))$"))
+
+(define oct-regex
+  (js.RegExp "^(-|\\+)?0[0-7]+$"))
+
+(define hex-regex
+  (js.RegExp "^(-|\\+)?0[xX][0-9a-fA-F]+$"))
+
+(define float-regex
+  (js.RegExp "^(-|\\+)?(0|([1-9][0-9]*))\\.(0|([1-9][0-9]*))$"))
+
+(define qualified-symbol-regex
+  (js.RegExp "[^:]+::[^:]+"))
+
+(define constituent-regex (js.RegExp "#"))
+
+(define (terminal? x)
+  (or (nil? x)
+      (.test whitespace-regex x)
+      (. reader-macros x)))
+
+(define (not-constituent? x)
+  (and (terminal? x) (not (.test constituent-regex x))))
+
+(define-method (Reader this input origin)
+  (if (instanceof this Reader)
+      (doto this
+        (set! :input input)
+        (set! :origin (or origin "unknown origin"))
+        (set! :offset 0)
+        (set! :line   1)
+        (set! :column 0)
+        (set! :last-offset 0)
+        (set! :last-line   1)
+        (set! :last-column 1))
+      (new Reader input origin)))
+
+(define-type Position (offset line column origin))
+
+(extend-generic represent
+  (Position
+   (fn (x p e)
+       (p (+ "line " x.line ", column " x.column ", in " x.origin)))))
+
+(define (get-position reader)
+  (new Position
+       reader.offset
+       reader.line
+       reader.column
+       reader.origin))
+
+(define (set-position reader position)
+  (doto reader
+    (set! :offset position.offset)
+    (set! :line   position.line)
+    (set! :column position.column)))
+
+(define (peek-char reader)
+  (when (< reader.offset reader.input.length)
+        (. reader.input reader.offset)))
+
+(define (read-char reader)
+  (let ((c (peek-char reader)))
+    (when c
+      (doto reader
+        (set! :last-offset reader.offset)
+        (set! :last-line   reader.line)
+        (set! :last-column reader.column)
+        (set! :offset      (+ reader.offset 1)))
+      (if (.test newline-regex c)
+          (begin
+            (inc! reader.line)
+            (set! reader.column 1))
+          (inc! reader.column))
+      c)))
+
+(define (unread-char reader)
+  (doto reader
+    (set! :offset reader.last-offset)
+    (set! :line   reader.last-line)
+    (set! :column reader.last-column)))
+
+(define (read-whitespace reader)
+  (let ((in-comment? #f))
+    (loop
+     (case (read-char reader)
+       (#nil  (return))
+       (" ")
+       ("\t")
+       ("\b")
+       ("\r"  (set! in-comment? #f))
+       ("\n"  (set! in-comment? #f))
+       ("\f"  (set! in-comment? #f))
+       (";"   (set! in-comment? #t))
+       (:else
+        (unless in-comment?         
+          (unread-char reader)
+          (return)))))))
+
+(define (invoke-reader-macro c reader)
+  (let ((macro (. reader-macros c)))
+    (when macro (macro reader))))
+
+(define (read-form reader)
+  (read-whitespace reader)
+  (let ((c (peek-char reader)))
+    (when c
+      (or (invoke-reader-macro c reader)
+          (read-atom reader)))))
+
+(define (read-chars-until predicate reader)
+  (let ((chars []))
+    (loop
+     (if (predicate (peek-char reader))
+         (return)
+         (.push chars (read-char reader))))
+    (.join chars "")))
+
+(define (read-atom reader)
+  (let ((s (read-chars-until not-constituent? reader)))
+    (cond     
+     ((.test int-regex s)   (js.parseInt s))
+     ((.test oct-regex s)   (js.parseInt s 8))
+     ((.test hex-regex s)   (js.parseInt s 16))
+     ((.test float-regex s) (js.parseFloat s))
+     (:else
+      (if (= (first s) ":")
+          (make-keyword (.substring s 1))
+          (parse-symbol s))))))
+
+(define (parse-symbol s)
+  (if (.test qualified-symbol-regex s)
+      (let ((pair (.split s "::")))
+        (make-qualified-symbol pair.0 pair.1))
+      (make-symbol s)))
+
+(define escape-map
+  (object
+   "t"  "\t"
+   "n"  "\n"
+   "r"  "\r"
+   "f"  "\f"
+   "b"  "\b"
+   "\\" "\\"
+   "\"" "\""))
+
+(define (escape-char c)
+  (or (. escape-map c)
+      (throw (js.Error (+ "invalid escape character: " c)))))
+
+(define (read-string-literal reader)
+  (let ((chars [])
+        (pos (get-position reader)))
+    (read-char reader)
+    (loop
+     (let ((c (read-char reader)))
+       (case c
+         (#nil  (eof-error!
+                 (print-str "unclosed string literal at" pos)))
+         ("\""  (return))
+         ("\\"  (.push chars (escape-char (read-char reader))))
+         (:else (.push chars c)))))
+    (.join chars "")))
+
+(define (get-dispatch-macro reader c)
+  (or (. dispatch-reader-macros c)
+      (throw (js.Error
+              (print-str "invalid reader-macro character"
+                         c
+                         "at"
+                         (get-position reader))))))
+
+(define (read-dispatch-macro reader)
+  (read-char reader)
+  ((get-dispatch-macro reader (peek-char reader)) reader))
+
+(define (read-forms-until predicate reader eof-message pop-one?)
+  (let ((pos   (get-position reader))
+        (forms []))
+    (when pop-one? (read-char reader))
+    (loop
+     (cond
+      ((predicate reader) (return))
+      ((let ((form (read-form reader)))
+         (unless form (eof-error! (print-str eof-message "at" pos)))
+         (.push forms form)))))
+    forms))
+
+(define (list-end? reader)
+  (read-whitespace reader)
+  (when (= (peek-char reader) ")")
+        (read-char reader)
+        #t))
+
+(define (read-list reader)
+  (array->list
+   (read-forms-until list-end? reader "unclosed list" #t)))
+
+(define (array-end? reader)
+  (read-whitespace reader)
+  (when (= (peek-char reader) "]")
+        (read-char reader)
+        #t))
+
+(define (read-array reader)
+  (read-forms-until array-end? reader "unclosed array" #t))
+
+(define (make-literal-reader string value)  
+  (fn (reader)
+      (let ((pos (get-position reader))
+            (chars (read-chars-until terminal? reader)))
+        (if (= chars string)
+            value
+            (throw (js.Error (print-str
+                              "invalid dispatch macro:"
+                              chars
+                              "at"
+                              pos)))))))
+
+(define (mismatched-delimiter reader)
+  (throw
+   (js.Error
+    (print-str "mismatched delimiter"
+               (peek-char reader)
+               "at"
+               (get-position reader)))))
+
+(doto reader-macros
+  (set! "("  read-list)
+  (set! "["  read-array)
+  (set! ")"  mismatched-delimiter)
+  (set! "]"  mismatched-delimiter)
+  (set! "#"  read-dispatch-macro)
+  (set! "\"" read-string-literal))
+
+(doto dispatch-reader-macros
+  (set! "n"  (make-literal-reader "nil" #nil))
+  (set! "t"  (make-literal-reader "t"   #t))
+  (set! "f"  (make-literal-reader "f"   #f))
+  (set! "v"  (make-literal-reader "void" ((fn (_)))))
+  (set! "/"  read-regex-literal)
+  (set! "\"" read-heredoc))

@@ -1,0 +1,35 @@
+(import prelude)
+(import poet/reader)
+(import poet/env)
+
+(define (p))
+
+(define-syntax spy
+  ((spy x)
+   (let ((x* x))
+     (pr (quote x))
+     (print " => ")
+     (prn x*))))
+
+(spy (read-form (Reader "42")))
+(spy (number? (read-form (Reader "42"))))
+(spy (read-form (Reader "foo")))
+(spy (symbol? (read-form (Reader "foo"))))
+(spy (read-form (Reader ":foo")))
+(spy (keyword? (read-form (Reader ":foo"))))
+(spy (read-form (Reader "foo::bar")))
+(spy (qualified-symbol? (read-form (Reader "foo::bar"))))
+(spy (terminal? ")"))
+(spy (not-constituent? ")"))
+(spy (read-form (Reader "(1 2 3 4 5 6)")))
+(spy (read-form (Reader "[ a b (1 :foo 2 :bar 3 [4 5] 6) ]")))
+
+(spy (to-key "foo"))
+(spy (to-key 'foo))
+(spy (to-key :foo))
+(spy (to-key [:LABEL 'foo]))
+
+(spy (to-name 'foo))
+(spy (to-name :foo))
+(spy (to-name "foo"))
+
