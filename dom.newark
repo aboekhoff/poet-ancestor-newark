@@ -1,0 +1,55 @@
+(import prelude)
+(import model :prefix db/)
+
+(define-syntax onload
+  ((onload body ...)
+   (let ((old-onload js.onload))
+     (set! js.onload
+       (fn ()
+           (when old-onload (old-onload))
+           body ...)))))
+
+(define (make-text content)
+  (.createTextNode content))
+
+(define (make-element tag)
+  (.createElement js.document tag))
+
+(define (make-fragment tag)
+  (.createDocumentFragment js.document tag))
+
+(define (by-id id)
+  (.getElementById js.document id))
+
+(define (html* xs ctx)
+  (let ((ctx (or ctx (make-fragment))))
+    (do-array (x xs)
+      (.appendChild ctx (html x)))
+    ctx))
+
+(define lexer
+  (js.RegExp "([^\\s\\.#]+)(?:#([^\\s\\.#]+))?(?:\\.([^\\s#]+))?"))
+
+(define (html* xs ctx offset)
+  (do-times (i (- xs.length offset))
+    (.appendChild ctx (html (. xs (+ i offset)))))
+  ctx)
+
+(define-generic html (x))
+
+(extend-generic html
+  (js.Node (fn (x) x))
+                
+  (js.String
+   (fn (x) (.createTextNode js.document x)))
+  
+  (js.Array
+   (fn (x)
+     (if (keyword? x.0)
+         (let* ((data (.exec lexer x.0.name))
+                (elt  (make-element data.1)))
+           (when data.2 (set! elt.id data.2))
+           (when data.3 (set! elt.className (.replace data.3 "." " ")))
+           (html* x elt 1))
+         (let ((elt (make-fragment)))
+           (html* x elt 0))))))

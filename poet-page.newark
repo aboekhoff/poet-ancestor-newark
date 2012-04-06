@@ -1,0 +1,138 @@
+(import prelude)
+(import dom)
+(import model :prefix db:)
+
+(define max-radius 30)
+(define min-radius 10)
+(define max-mass 10)
+(define min-mass 1)
+(define max-speed 5)
+(define min-speed -5)
+
+(define canvas #nil)
+
+(define -width #nil)
+(define -height #nil)
+
+(define -step 0.2)
+
+(define (resize!)
+  (unless (and (= -width js.innerWidth)
+               (= -height js.innerHeight))
+          (set! -width js.innerWidth)
+          (set! -height js.innerHeight)
+          (set! canvas.width -width)
+          (set! canvas.height -height)))
+
+(define (get-context) (.getContext canvas "2d"))
+
+(define (rotate-about pos rads ctx)
+  (let ((ctx (or ctx (get-context))))
+    (doto ctx
+          (.translate pos.0 pos.1)
+          (.rotate rads)
+          (.translate (- pos.0) (- pos.1)))))
+
+(define (random min max)
+  (let* ((min* (if max min 0))
+         (max* (if max max min)))
+    (+ (* (js.Math.random) (- max* min*)) min*)))
+
+(define (random-int min max)
+  (js.Math.floor (random min max)))
+
+(define (random-color)
+  (+ "rgb(" (random-int 255) "," (random-int 255) "," (random-int 255) ")"))
+
+(define tau (* js.Math.PI 2))
+
+(define (make-balls n)
+  (let ((n (or n 0)))
+    (do-times (_ n)
+      (let ((r (random-int max-radius min-radius)))
+        (db:make-model
+         :ball
+         :radius r
+         :mass   (random-int max-mass min-mass)
+         :x-vel  (random max-speed min-speed)
+         :y-vel  (random max-speed min-speed)
+         :x-pos  (random r (- -width r))
+         :y-pos  (random r (- -height r))
+         :color  (random-color)
+         :accel  0.5)))))
+
+(define (init)
+  (set! canvas (html [:canvas#fun-with-balls]))
+  (js.document.body.appendChild canvas)
+  (resize!)
+  (make-balls 2000))
+
+(define (draw-ball ball)
+  (let* ((ctx (get-context))
+         (a   ball.attributes)
+         (x   a.x-pos)
+         (y   a.y-pos)
+         (r   a.radius)
+         (m   a.mass)
+         (c   a.color))
+    (set! ctx.fillStyle c)
+    (doto ctx
+      (.beginPath)
+      (.arc x y r 0 tau #f)
+      (.closePath)
+      (.stroke)
+      (.fill))))
+
+(define (draw-balls)
+  (do-array (ball (. (db:get-collection :ball) :models))
+            (draw-ball ball)))
+
+(define (move-ball ball)
+  (let* ((a     ball.attributes)
+         (r     a.radius)
+         (x     a.x-pos)
+         (y     a.y-pos)
+         (x-vel a.x-vel)
+         (y-vel a.y-vel)
+         (x*    (+ x (* x-vel -step)))
+         (y*    (+ y (* y-vel -step))))
+    (if (< (- x* r) 0)
+        (begin
+          (db:set ball :x-vel (- x-vel))
+          (set! x* r))
+        (when (> (+ x* r) -width)
+              (db:set ball :x-vel (- x-vel))
+              (set! x* (- -width r))))
+
+    (if (< (- y* r) 0)
+        (begin
+          (db:set ball :y-vel (- y-vel))
+          (set! y* r))
+        (when (> (+ y* r) -height)
+              (db:set ball :y-vel (- y-vel))
+              (set! y* (- -height r))))
+
+    (db:set ball :x-pos x*)
+    (db:set ball :y-pos y*)))
+
+(define (move-balls)
+  (do-array (ball (. (db:get-collection :ball) :models))
+            (move-ball ball)))
+
+(define (render)
+  (resize!)
+  (let ((ctx (get-context)))
+    (.clearRect ctx 0 0 -width -height)
+    (draw-balls)))
+
+(define (update)
+  (move-balls))
+
+(define (main)
+  (update)
+  (render))
+
+(onload
+ (init)
+ (js.setInterval main 1)
+ (js.console.log (db:get-collection :ball)))

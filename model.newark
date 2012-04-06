@@ -1,0 +1,66 @@
+(import :prelude)
+
+(set! Keyword.prototype.toString (method (this) this.name))
+
+(define *db* (js.Object))
+(define-type Collection (type models next-id))
+(define-type Model      (type id attributes))
+
+(define-generic to-name (x))
+(extend-generic to-name
+  (js.String (fn (x) x))
+  (Keyword   (fn (x) x.name))
+  (Symbol    (fn (x) (pr-str x))))
+
+(define (-make-object attributes)
+  (let ((obj (js.Object))
+        (end attributes.length)
+        (i 0))
+    (loop
+     (when (= i end) (return))
+     (set! (. obj (to-name (. attributes i))) (. attributes (+ i 1)))
+     (set! i (+ i 2)))
+    obj))
+
+(define (-make-collection type)
+  (let ((coll (new Collection type [] 0)))
+    (set! (. *db* type.name) coll)
+    coll))
+
+(define (get-collection type)
+  (or (. *db* type.name)
+      (-make-collection type)))
+
+(define (by-id type id)  
+  (-> (get-collection type) (. :models) (. id)))
+
+(define (next-id type)
+  (let* ((coll (get-collection type))
+         (id   coll.next-id))
+    (inc! coll.next-id)
+    id))
+
+(define (publish publisher . data)
+  (when publisher.-subscribers
+    (do-array (subscriber publisher.-subscribers)
+       (apply subscriber data))))
+
+(define (subscribe publisher subscriber)
+  (when (not publisher.-subscribers)
+        (set! publisher.-subscribers []))
+  (.push publisher.-subscribers subscriber))
+
+(define (make-model type . attributes)
+  (let* ((coll  (get-collection type))
+         (id    (next-id type))
+         (model (new Model type id (-make-object attributes))))
+    (set! (. coll.models id) model)
+    model))
+
+(define (get model property not-found)
+  (if (.hasOwnProperty model.attributes property)
+      (. model.attributes property)
+      not-found))
+
+(define (set model property value)
+  (set! (. model.attributes property) value))
