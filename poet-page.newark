@@ -7,8 +7,8 @@
 (define min-radius 10)
 (define max-mass 10)
 (define min-mass 1)
-(define max-speed 10)
-(define min-speed -10)
+(define max-speed 8)
+(define min-speed -8)
 
 (define canvas #nil)
 
@@ -135,5 +135,5 @@
 
 (onload
  (init)
- (js.setInterval main 1)
+ (js.setInterval main 2)
  (js.console.log (db:get-collection :ball)))

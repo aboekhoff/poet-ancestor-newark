@@ -2068,8 +2068,8 @@ if (typeof require != 'undefined') {
   newark["poet-page::min-radius"] = 10;
   newark["poet-page::max-mass"] = 10;
   newark["poet-page::min-mass"] = 1;
-  newark["poet-page::max-speed"] = 10;
-  newark["poet-page::min-speed"] = -10;
+  newark["poet-page::max-speed"] = 8;
+  newark["poet-page::min-speed"] = -8;
   newark["poet-page::canvas"] = null;
   newark["poet-page::-width"] = null;
   newark["poet-page::-height"] = null;
@@ -2360,7 +2360,7 @@ if (typeof require != 'undefined') {
       x_0_12();
     };
     newark["poet-page::init"]();
-    newark["core::js"]["setInterval"](newark["poet-page::main"], 1);
+    newark["core::js"]["setInterval"](newark["poet-page::main"], 2);
     x_1_1 = newark["model::get-collection"](x_0_1);
     x_1_0 = newark["core::js"]["console"]["log"](x_1_1);
     return x_1_0;
